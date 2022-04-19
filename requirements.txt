@@ -1,0 +1,5 @@
+xlrd
+selenium
+beautifulsoup4
+webdriver-manager
+selectorlib
