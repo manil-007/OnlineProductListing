@@ -4,4 +4,4 @@ This repo will be used for extracting the information from the similar products 
 Steps for extracting the data:
 
 1. pip install -r requirements.txt
-2. python amazon_scrapper.py
+2. python app.py
