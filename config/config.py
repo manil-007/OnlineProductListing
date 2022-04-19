@@ -1,4 +1,4 @@
-numberOfProducts = 5
+numberOfProducts = 2
 
 inputFileName = "config/test.xlsx"
-outputFileName = "output/extractedData.csv"
+outputFileName = "extractedData"

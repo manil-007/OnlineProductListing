@@ -1,15 +1,10 @@
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.chrome import *
-from selenium.common.exceptions import NoSuchElementException
-from selectorlib import Extractor
-import requests
-import json
-import time
 import xlrd
 from bs4 import BeautifulSoup
 import csv
 from config import config
+from datetime import datetime
 
 
 def get_url(search_product):
@@ -23,13 +18,13 @@ def get_url(search_product):
 def search_amazon(driver, prd_name):
     final_output = []
     search_url = get_url(prd_name)
-    for page in range(config.numberOfProducts):
+    for page in range(1):
         driver.get(search_url.format(str(page)))
         driver.implicitly_wait(3)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
         rank = 1
-        for i in range(5):
+        for i in range(config.numberOfProducts):
             item = results[i]
             atag = item.h2.a
             product_url = 'https://www.amazon.in/' + atag.get('href')
@@ -73,8 +68,10 @@ def createOutputFile(inputFileName, outputFileName):
         print("Extracting for -> ", str(sheet.cell_value(i, 1)))
         out += search_amazon(driver, str(sheet.cell_value(i, 1)))
     driver.quit()
+    now = datetime.now()
+    curr_datetime = now.strftime("%d-%m-%Y_%H-%M-%S")
 
-    fileName = outputFileName
+    fileName = "output/" + outputFileName + "_" + curr_datetime + ".csv"
     f = open(fileName, 'w')
     fields = ["Parent Product", "Rank", "Url", "Title", "Price", "Description"]
     writer = csv.writer(f)
