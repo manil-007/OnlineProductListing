@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import *
 import xlrd
 from bs4 import BeautifulSoup
@@ -77,13 +78,18 @@ def search_amazon(driver, prd_name):
     return final_output
 
 
-def createOutputFile(inputFileName, outputFileName):
+def createOutputFile(inputFileName, outputFileName, headless):
     loc = inputFileName
     wb = xlrd.open_workbook(loc)
     sheet = wb.sheet_by_index(0)
     sheet.cell_value(0, 0)
     out = []
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+
+    chromeOptions = Options()
+    chromeOptions.headless = headless
+    
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chromeOptions)
+
     for i in range(1, sheet.nrows):
         print("Extracting for -> ", str(sheet.cell_value(i, 1)))
         out += search_amazon(driver, str(sheet.cell_value(i, 1)))
