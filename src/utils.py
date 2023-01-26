@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import csv
 from config import config
 from datetime import datetime
+import re
 
 
 def get_url(search_product):
@@ -32,10 +33,29 @@ def search_amazon(driver, prd_name):
             driver.implicitly_wait(3)
             product_soup = BeautifulSoup(driver.page_source, 'html.parser')
             prd_title = ""
+            product_details = product_soup.find("table", {"class": "a-normal a-spacing-micro"})
+
             try:
                 prd_title = product_soup.find("span", {"id": "productTitle"}).text.strip()
             except:
                 print("Product Title Not Available")
+            details = ""
+            try:
+                for row in product_details.tbody.find_all("tr"):
+                    columns = row.find_all("td")
+
+                    def getValFromTable(columnName):
+                        return columnName[columnName.rfind('">') + len('">'):columnName.rfind('</span')]
+
+                    details += (getValFromTable(str(columns[0])) + "-" + getValFromTable(str(columns[1]))) + "|"
+
+            except:
+                print("Product Details not present")
+            brand = ""
+            try:
+                brand = details[details.rfind("Brand-") + len("Brand-"):details.find("|")]
+            except:
+                print("Product Brand not present")
             prd_des = ""
             try:
                 des = product_soup.find("div", {"id": "feature-bullets"}).find("ul")
@@ -49,8 +69,8 @@ def search_amazon(driver, prd_name):
                 price = product_soup.find("span", {"class": "a-price-whole"}).text
             except:
                 print("Product Price Not Available")
-            final_output.append([prd_name, str(rank), product_url, prd_title, price, prd_des])
-            print([prd_name, str(rank), product_url, prd_title, price, prd_des])
+            final_output.append([prd_name, str(rank), product_url, prd_title, details, brand, price, prd_des])
+            print([prd_name, str(rank), product_url, prd_title, details, brand, price, prd_des])
             rank += 1
     # driver.quit()
     print("---DONE---")
@@ -73,7 +93,7 @@ def createOutputFile(inputFileName, outputFileName):
 
     fileName = "output/" + outputFileName + "_" + curr_datetime + ".csv"
     f = open(fileName, 'w')
-    fields = ["Parent Product", "Rank", "Url", "Title", "Price", "Description"]
+    fields = ["Parent Product", "Rank", "Url", "Title", "Details", "Brand", "Price", "Description"]
     writer = csv.writer(f)
     writer.writerow(fields)
     writer.writerows(out)
