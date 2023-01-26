@@ -1,4 +1,4 @@
-numberOfProducts = 2
+numberOfProducts = 10
 
 inputFileName = "config/test.xlsx"
 outputFileName = "extractedData"
