@@ -39,3 +39,9 @@ OR
 
 ### Swagger UI
 Swagger UI is available only in test / debug mode. Access URL - localhost:5000/api/v1/ui/ to test the API.
+
+## References
+- [Python REST APIs With Flask, Connexion, and SQLAlchemy](https://dassum.medium.com/python-rest-apis-with-flask-connexion-and-sqlalchemy-3c8c3292d9ce)
+- [How to write README.md](https://medium.com/@saumya.ranjan/how-to-write-a-readme-md-file-markdown-file-20cb7cbcd6f)
+- [Swagger YAML Editor](https://editor.swagger.io/)
+

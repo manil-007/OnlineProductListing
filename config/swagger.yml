@@ -48,8 +48,8 @@ paths:
           description: Validation exception
   /run:
     get:
-      summary: run
-      description: run
+      summary: run get
+      description: run get
       operationId: controllers.controllers.run
       parameters:
         - name: username
@@ -58,9 +58,9 @@ paths:
           schema:
             type: string
             default: vatsaaa
-            description: run
+            description: run get
       tags:
-        - run
+        - run get
       responses:
         '200':
           description: Successful operation
@@ -74,6 +74,53 @@ paths:
         '400':
           description: Invalid ID supplied
         '404':
-          description: Pet not found
+          description: Not found
         '405':
           description: Validation exception
+    post:
+      tags:
+        - run post
+      summary: Search and get data
+      description: Search and get data
+      operationId: controllers.controllers.run_post
+      requestBody:
+        description: Seach and get data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchTerm'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SearchTerm'
+        '405':
+          description: Invalid input
+
+components:
+  schemas:
+    SearchTerm:
+      required:
+        - search_string
+        - num_of_products
+      type: object
+      properties:
+        search_string:
+          type: string
+          example: Essential Oils; Garam Masala
+        num_of_products:
+          type: integer
+          format: int64
+          example: 10

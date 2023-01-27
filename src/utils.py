@@ -78,11 +78,7 @@ def search_amazon(driver, prd_name):
     return final_output
 
 
-def create_output_file(input_file_name, output_file_name, headless):
-    loc = input_file_name
-    wb = xlrd.open_workbook(loc)
-    sheet = wb.sheet_by_index(0)
-    sheet.cell_value(0, 0)
+def create_output_file(input_file_name, output_file_name, headless, sss: str=None):
     out = []
 
     chromeOptions = Options()
@@ -90,9 +86,18 @@ def create_output_file(input_file_name, output_file_name, headless):
     
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=chromeOptions)
 
-    for i in range(1, sheet.nrows):
-        print("Extracting for -> ", str(sheet.cell_value(i, 1)))
-        out += search_amazon(driver, str(sheet.cell_value(i, 1)))
+    # stripped_search_strings is empty, so read search strings from xlsx
+    if sss:
+        for s in sss:
+            out += search_amazon(driver, s)
+    else:
+        wb = xlrd.open_workbook(input_file_name)
+        sheet = wb.sheet_by_index(0)
+        sheet.cell_value(0, 0)
+
+        for i in range(1, sheet.nrows):
+            print("Extracting for -> ", str(sheet.cell_value(i, 1)))
+            out += search_amazon(driver, str(sheet.cell_value(i, 1)))
     
     driver.quit()
     
