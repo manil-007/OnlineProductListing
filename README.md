@@ -19,3 +19,6 @@ OR
 OR
 
 `python main.py` # Run with browser - use for debugging
+
+### Swagger UI
+Swagger UI is available only in test / debug mode. Access URL - localhost:5000/api/v1/ui/ to test the API.
