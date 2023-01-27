@@ -4,7 +4,7 @@ from webdriver_manager.chrome import *
 import xlrd
 from bs4 import BeautifulSoup
 import csv
-from config import config
+from config.config import cfg
 from datetime import datetime
 import re
 
@@ -26,7 +26,7 @@ def search_amazon(driver, prd_name):
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
         rank = 1
-        for i in range(config.numberOfProducts):
+        for i in range(cfg["app"]["number_of_products"]):
             item = results[i]
             atag = item.h2.a
             product_url = 'https://www.amazon.in/' + atag.get('href')
@@ -78,8 +78,8 @@ def search_amazon(driver, prd_name):
     return final_output
 
 
-def createOutputFile(inputFileName, outputFileName, headless):
-    loc = inputFileName
+def create_output_file(input_file_name, output_file_name, headless):
+    loc = input_file_name
     wb = xlrd.open_workbook(loc)
     sheet = wb.sheet_by_index(0)
     sheet.cell_value(0, 0)
@@ -93,11 +93,13 @@ def createOutputFile(inputFileName, outputFileName, headless):
     for i in range(1, sheet.nrows):
         print("Extracting for -> ", str(sheet.cell_value(i, 1)))
         out += search_amazon(driver, str(sheet.cell_value(i, 1)))
+    
     driver.quit()
+    
     now = datetime.now()
     curr_datetime = now.strftime("%d-%m-%Y_%H-%M-%S")
 
-    fileName = "output/" + outputFileName + "_" + curr_datetime + ".csv"
+    fileName = "output/" + output_file_name + "_" + curr_datetime + ".csv"
     f = open(fileName, 'w')
     fields = ["Parent Product", "Rank", "Url", "Title", "Details", "Brand", "Price", "Description"]
     writer = csv.writer(f)
