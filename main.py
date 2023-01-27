@@ -29,10 +29,6 @@ def process_args(args):
     cfg["app"]["headless"] = headless_mode
 
 if __name__=='__main__':
-    if len(sys.argv) < 2:
-        usage(sys.argv[0])
-        exit(-1)
-
     process_args(args=sys.argv)
 
     serve(app=app, host=cfg["app"]["host"], port=cfg["app"]["port"])

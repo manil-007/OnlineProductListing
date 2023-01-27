@@ -1,7 +1,21 @@
-# OnlineProductListing
+# Online Product Listing
 This repo will be used for extracting the information from the similar products and will generate the best listing of the products.
 
-Steps for extracting the data:
+## How to run
+### Setup a virtual environment
+`python3 -m venv venv` 
+`pip install -r requierments.txt`
 
-1. pip install -r requirements.txt
-2. python app.py
+### Run as standalone module
+`python app.py -h` # run in headless mode
+
+OR
+
+`python app.py -u` # prints usage
+
+### Run as centralised API
+`python main.py -h` # Run in headless mode - preferred
+
+OR
+
+`python main.py` # Run with browser - use for debugging
