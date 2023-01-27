@@ -172,6 +172,7 @@ const LinaerStepper = () => {
     console.log(data);
     if (activeStep === steps.length - 1) {
       console.log(data);
+      setActiveStep(activeStep + 1);
     } else {
       setActiveStep(activeStep + 1);
       setSkippedSteps(
