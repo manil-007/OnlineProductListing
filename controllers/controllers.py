@@ -20,5 +20,6 @@ def run(username: str):
 def run_post(username: str="vatsaaa"):
     search_strings = request.get_json()["search_string"].split(";")
     stripped_search_strings = [s.strip() for s in search_strings]
+    num_of_products = request.get_json()["num_of_products"]
 
-    create_output_file(cfg["app"]["input_file_name"], cfg["app"]["output_file_name"], cfg["app"]["headless"], stripped_search_strings)
+    create_output_file(cfg["app"]["input_file_name"], cfg["app"]["output_file_name"], cfg["app"]["headless"], stripped_search_strings, num_of_products)

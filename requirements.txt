@@ -3,3 +3,7 @@ selenium
 beautifulsoup4
 webdriver-manager
 selectorlib
+flask_cors
+connexion
+connexion[swagger-ui]
+waitress

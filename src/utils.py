@@ -17,7 +17,7 @@ def get_url(search_product):
     return url
 
 
-def search_amazon(driver, prd_name):
+def search_amazon(driver, prd_name, num_of_products):
     final_output = []
     search_url = get_url(prd_name)
     for page in range(1):
@@ -26,7 +26,7 @@ def search_amazon(driver, prd_name):
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
         rank = 1
-        for i in range(cfg["app"]["number_of_products"]):
+        for i in range(num_of_products):
             item = results[i]
             atag = item.h2.a
             product_url = 'https://www.amazon.in/' + atag.get('href')
@@ -78,7 +78,7 @@ def search_amazon(driver, prd_name):
     return final_output
 
 
-def create_output_file(input_file_name, output_file_name, headless, sss: str=None):
+def create_output_file(input_file_name, output_file_name, headless, sss: str=None, num_of_products: int=10):
     out = []
 
     chromeOptions = Options()
@@ -89,7 +89,7 @@ def create_output_file(input_file_name, output_file_name, headless, sss: str=Non
     # stripped_search_strings is empty, so read search strings from xlsx
     if sss:
         for s in sss:
-            out += search_amazon(driver, s)
+            out += search_amazon(driver, s, num_of_products)
     else:
         wb = xlrd.open_workbook(input_file_name)
         sheet = wb.sheet_by_index(0)
@@ -97,7 +97,7 @@ def create_output_file(input_file_name, output_file_name, headless, sss: str=Non
 
         for i in range(1, sheet.nrows):
             print("Extracting for -> ", str(sheet.cell_value(i, 1)))
-            out += search_amazon(driver, str(sheet.cell_value(i, 1)))
+            out += search_amazon(driver, str(sheet.cell_value(i, 1)), num_of_products)
     
     driver.quit()
     
