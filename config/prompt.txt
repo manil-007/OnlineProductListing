@@ -1,0 +1,10 @@
+Please extract keywords from the given text based on the following rules:
+Remove special characters from the given text. After that convert the result to lower case. Do not output lower case text.
+Find words matching the regex brand-(\w+)| and then remove the matching text from the text in lower case
+Consider measurement units as stop words and remove them
+Generate stop words from the words that occur in the text with a frequency above 80 percentile
+A word is considered a keyword if its length is greater than or equal to 3 characters
+The maximum length of a phrase considered a keyword is 3 words
+A phrase must occur at least once in the text to be considered a keyword.
+
+My request is, extract keywords from: 

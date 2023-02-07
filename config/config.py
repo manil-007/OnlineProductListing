@@ -21,6 +21,9 @@ cfg = {
             "username": "admin",
             "password": "admin"
         }
+    },
+    "openapi": {
+        "secret": "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"
     }
 }
 

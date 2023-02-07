@@ -108,6 +108,38 @@ paths:
                 $ref: '#/components/schemas/SearchTerm'
         '405':
           description: Invalid input
+  /extract_keywords:
+    post:
+      tags:
+        - extract keywords
+      summary: Extract keywords from given text
+      description: Extract keywords from given text
+      operationId: controllers.controllers.extract_keywords
+      requestBody:
+        description: Text from which keywords need to be extracted
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeywordsText'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/KeywordsText'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/KeywordsText'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeywordsText'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/KeywordsText'
+        '405':
+          description: Invalid input
 
 components:
   schemas:
@@ -124,3 +156,11 @@ components:
           type: integer
           format: int64
           example: 10
+    KeywordsText:
+      required:
+        - keywords_text
+      type: object
+      properties:
+        keywords_text:
+          type: string
+          example: "Pure Source India Aroma Diffuser..."
