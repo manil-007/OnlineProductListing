@@ -44,4 +44,6 @@ Swagger UI is available only in test / debug mode. Access URL - localhost:5000/a
 - [Python REST APIs With Flask, Connexion, and SQLAlchemy](https://dassum.medium.com/python-rest-apis-with-flask-connexion-and-sqlalchemy-3c8c3292d9ce)
 - [How to write README.md](https://medium.com/@saumya.ranjan/how-to-write-a-readme-md-file-markdown-file-20cb7cbcd6f)
 - [Swagger YAML Editor](https://editor.swagger.io/)
-
+- [Tokens checker](https://platform.openai.com/tokenizer)
+- [OpenAI API Cookbook](https://github.com/openai/openai-cookbook)
+- [Handling rate limits](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_handle_rate_limits.ipynb)
