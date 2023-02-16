@@ -41,7 +41,7 @@ def extract_keywords():
 
     print(prompt)
 
-    response = openai.Completion.create(model="text-davinci-003", 
+    response = completion_with_backoff(model="text-davinci-003", 
                                         prompt="\"\"\"\n"+prompt+"\n\"\"\"", 
                                         temperature=0.7, 
                                         max_tokens=1024,
