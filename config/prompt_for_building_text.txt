@@ -1,0 +1,1 @@
+I want you to create an advertising text from pythonic list of keywords that I give. My first request is to create advertising text from:

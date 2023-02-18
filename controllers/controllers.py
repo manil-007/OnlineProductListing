@@ -37,9 +37,7 @@ def run_post(username: str="vatsaaa"):
 
 def extract_keywords():
     text = request.get_json()["keywords_text"]
-    prompt = Path("config/prompt.txt").read_text() + text
-
-    print(prompt)
+    prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + text
 
     response = completion_with_backoff(model="text-davinci-003", 
                                         prompt="\"\"\"\n"+prompt+"\n\"\"\"", 
@@ -62,3 +60,19 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
 def completion_with_backoff(**kwargs):
     return openai.Completion.create(**kwargs)
+
+def keywords_to_text():
+    keywords = request.get_json()
+    prompt = Path("config/prompt_for_building_text.txt").read_text() + ",".join(keywords)
+
+    response = completion_with_backoff(model="text-davinci-003", 
+                                        prompt="\"\"\"\n"+prompt+"\n\"\"\"", 
+                                        temperature=0.7, 
+                                        max_tokens=1024,
+                                        top_p=1.0,
+                                        frequency_penalty=0.0,
+                                        presence_penalty=0.0,
+                                        stop=["\"\"\""]
+                                    )
+    
+    return jsonify(response)

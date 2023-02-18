@@ -140,6 +140,38 @@ paths:
                 $ref: '#/components/schemas/KeywordsText'
         '405':
           description: Invalid input
+  /build_text:
+    post:
+      tags:
+        - Build text
+      summary: Build SEO text from given keywords
+      description: Build SEO text from given keywords
+      operationId: controllers.controllers.keywords_to_text
+      requestBody:
+        description: Keywords to use for building the SEO text
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Keywords'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Keywords'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Keywords'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keywords'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Keywords'
+        '405':
+          description: Invalid input
 
 components:
   schemas:
@@ -164,3 +196,10 @@ components:
         keywords_text:
           type: string
           example: "Pure Source India Aroma Diffuser..."
+    Keywords:
+      required:
+        - keywords
+      type: array
+      items:
+          type: string
+          example: "['essential oil', 'lavender oil', 'lemongrass oil', 'jasmine oil', 'orange oil', 'mandarin', 'rose oil', 'diffuser', 'oil burner', 'relaxation', 'stress', 'deodorize', 'mood', 'carrier oil', 'rubbing', 'massage blends', 'concentration', 'essential oils', 'steam distilled', 'natural', 'organic', 'therapeutic grade', 'humidifiers', 'sprays', 'home cleaning', 'topical absorbtion', 'external use', 'ingested']"
