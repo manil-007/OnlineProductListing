@@ -7,6 +7,7 @@ import csv
 from config.config import cfg
 from datetime import datetime
 import re
+import pandas as pd
 
 
 def get_url(search_product):
@@ -112,3 +113,10 @@ def create_output_file(input_file_name, output_file_name, headless, sss: str=Non
     writer.writerows(out)
 
     f.close()
+
+    df = pd.read_csv(fileName)
+    df = df.applymap(lambda s: s.lower() if type(s) == str else s)
+    df['Title'] = df.apply(lambda row: row['Title'].replace(str(row['Brand']), ''), axis=1)
+    df['Description'] = df.apply(lambda row: row['Description'].replace(str(row['Brand']), ''), axis=1)
+    df_new = df.groupby(df['Parent Product']).aggregate({'Title': ' '.join, 'Description': ' '.join})
+    return df_new.to_dict('dict')
