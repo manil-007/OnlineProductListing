@@ -9,8 +9,8 @@ import tiktoken
 import openai
 
 from config.config import cfg
-from src.utils import create_output_file
-from src.ProvisionOpenAI import ProvisionOpenAI
+from utils.utils import create_output_file
+from utils.ProvisionOpenAI import ProvisionOpenAI
 
 ProvisionOpenAI.set_api_key(cfg["openapi"]["secret"])
 
@@ -28,23 +28,25 @@ def ping(username: str, suffix: str = None):
 
 # Write Python function to tokenize a semicolon separated string
 
-def run(username: str):
-    create_output_file(cfg["app"]["input_file_name"], cfg["app"]["output_file_name"], cfg["app"]["headless"])
-
 def run_post(username: str = "vatsaaa"):
     search_strings = request.get_json()["search_string"].split(";")
     stripped_search_strings = [s.strip() for s in search_strings]
+
+    print("search_strings: ", search_strings)
+
     num_of_products = request.get_json()["num_of_products"]
 
     output = create_output_file(cfg["app"]["input_file_name"],
-                                  cfg["app"]["output_file_name"],
-                                  cfg["app"]["headless"],
-                                  stripped_search_strings,
-                                  num_of_products)
+                                cfg["app"]["headless"],
+                                stripped_search_strings,
+                                num_of_products
+                                )
     
     # Prepare response before returning
     response = jsonify(output)
     response.status_code = 200
+
+    print(response.data)
 
     return response
 
