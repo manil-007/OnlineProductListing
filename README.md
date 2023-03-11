@@ -47,3 +47,4 @@ Swagger UI is available only in test / debug mode. Access URL - localhost:5000/a
 - [Tokens checker](https://platform.openai.com/tokenizer)
 - [OpenAI API Cookbook](https://github.com/openai/openai-cookbook)
 - [Handling rate limits](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_handle_rate_limits.ipynb)
+- [CORS Handling](https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/)
