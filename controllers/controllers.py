@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import datetime as dt
 
 from flask import jsonify, request
+from flask_cors import cross_origin
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 import tiktoken
 import openai
@@ -30,15 +31,22 @@ def ping(username: str, suffix: str = None):
 def run(username: str):
     create_output_file(cfg["app"]["input_file_name"], cfg["app"]["output_file_name"], cfg["app"]["headless"])
 
-
 def run_post(username: str = "vatsaaa"):
     search_strings = request.get_json()["search_string"].split(";")
     stripped_search_strings = [s.strip() for s in search_strings]
     num_of_products = request.get_json()["num_of_products"]
 
-    create_output_file(cfg["app"]["input_file_name"], cfg["app"]["output_file_name"], cfg["app"]["headless"],
-                       stripped_search_strings, num_of_products)
+    output = create_output_file(cfg["app"]["input_file_name"],
+                                  cfg["app"]["output_file_name"],
+                                  cfg["app"]["headless"],
+                                  stripped_search_strings,
+                                  num_of_products)
+    
+    # Prepare response before returning
+    response = jsonify(output)
+    response.status_code = 200
 
+    return response
 
 def extract_keywords():
     text = request.get_json()["keywords_text"]
@@ -53,7 +61,8 @@ def extract_keywords():
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
-
+    response.status_code = 200
+ 
     return jsonify(response)
 
 
@@ -84,3 +93,6 @@ def keywords_to_text():
                                        )
 
     return jsonify(response)
+
+def generate_title():
+    pass

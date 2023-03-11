@@ -3,10 +3,9 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import *
 import xlrd
 from bs4 import BeautifulSoup
-import csv
+import csv, json
 from config.config import cfg
 from datetime import datetime
-import re
 import pandas as pd
 
 
@@ -20,6 +19,7 @@ def get_url(search_product):
 
 def search_amazon(driver, prd_name, num_of_products):
     final_output = []
+    product = {}
     search_url = get_url(prd_name)
     for page in range(1):
         driver.get(search_url.format(str(page)))
@@ -39,6 +39,7 @@ def search_amazon(driver, prd_name, num_of_products):
 
             try:
                 prd_title = product_soup.find("span", {"id": "productTitle"}).text.strip()
+                product["title"] = prd_title
             except:
                 print("Product Title Not Available")
             details = ""
@@ -51,31 +52,40 @@ def search_amazon(driver, prd_name, num_of_products):
 
                     details += (getValFromTable(str(columns[0])) + "-" + getValFromTable(str(columns[1]))) + "|"
 
+                product["details"] = details
             except:
                 print("Product Details not present")
             brand = ""
             try:
                 brand = details[details.rfind("Brand-") + len("Brand-"):details.find("|")]
+                product["brand"] = brand
             except:
                 print("Product Brand not present")
-            prd_des = ""
+                prd_des = ""
             try:
                 des = product_soup.find("div", {"id": "feature-bullets"}).find("ul")
                 prd_des = ""
                 for i in des.find_all("li"):
                     prd_des += i.text + " | "
+                
+                product["description"] = prd_des
             except:
                 print("Product Description not present")
-            price = ""
+                price = ""
             try:
                 price = product_soup.find("span", {"class": "a-price-whole"}).text
+                product["price"] = price
             except:
                 print("Product Price Not Available")
-            final_output.append([prd_name, str(rank), product_url, prd_title, details, brand, price, prd_des])
-            print([prd_name, str(rank), product_url, prd_title, details, brand, price, prd_des])
+            
+            product["url"] = product_url
+            product["name"] = prd_name
+            product["rank"] = str(rank)
+
+            final_output.append(product)
+
             rank += 1
-    # driver.quit()
-    print("---DONE---")
+
     return final_output
 
 
@@ -99,24 +109,5 @@ def create_output_file(input_file_name, output_file_name, headless, sss: str=Non
         for i in range(1, sheet.nrows):
             print("Extracting for -> ", str(sheet.cell_value(i, 1)))
             out += search_amazon(driver, str(sheet.cell_value(i, 1)), num_of_products)
-    
-    driver.quit()
-    
-    now = datetime.now()
-    curr_datetime = now.strftime("%d-%m-%Y_%H-%M-%S")
 
-    fileName = "output/" + output_file_name + "_" + curr_datetime + ".csv"
-    f = open(fileName, 'w')
-    fields = ["Parent Product", "Rank", "Url", "Title", "Details", "Brand", "Price", "Description"]
-    writer = csv.writer(f)
-    writer.writerow(fields)
-    writer.writerows(out)
-
-    f.close()
-
-    df = pd.read_csv(fileName)
-    df = df.applymap(lambda s: s.lower() if type(s) == str else s)
-    df['Title'] = df.apply(lambda row: row['Title'].replace(str(row['Brand']), ''), axis=1)
-    df['Description'] = df.apply(lambda row: row['Description'].replace(str(row['Brand']), ''), axis=1)
-    df_new = df.groupby(df['Parent Product']).aggregate({'Title': ' '.join, 'Description': ' '.join})
-    return df_new.to_dict('dict')
+    return out

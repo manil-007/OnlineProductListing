@@ -23,7 +23,7 @@ cfg = {
         }
     },
     "openapi": {
-        "secret": "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"
+        "secret": "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"
     }
 }
 
