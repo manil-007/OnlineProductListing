@@ -18,10 +18,7 @@ def get_url(search_product):
 
 
 def search_amazon(driver, prd_name, num_of_products):
-    print("Product Name: ", prd_name, " and Number of Products: ", num_of_products)
-    
     final_output = []
-    product = {}
     search_url = get_url(prd_name)
     for page in range(1):
         driver.get(search_url.format(str(page)))
@@ -30,6 +27,7 @@ def search_amazon(driver, prd_name, num_of_products):
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
         rank = 1
         for i in range(num_of_products):
+            product = {}
             item = results[i]
             atag = item.h2.a
             product_url = 'https://www.amazon.in/' + atag.get('href')

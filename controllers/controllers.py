@@ -31,9 +31,6 @@ def ping(username: str, suffix: str = None):
 def run_post(username: str = "vatsaaa"):
     search_strings = request.get_json()["search_string"].split(";")
     stripped_search_strings = [s.strip() for s in search_strings]
-
-    print("search_strings: ", search_strings)
-
     num_of_products = request.get_json()["num_of_products"]
 
     output = create_output_file(cfg["app"]["input_file_name"],
