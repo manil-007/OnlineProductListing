@@ -20,7 +20,9 @@ def get_url(search_product):
 def search_amazon(driver, prd_name, num_of_products):
     final_output = []
     search_url = get_url(prd_name)
+    id = 0
     for page in range(1):
+        id += 1
         driver.get(search_url.format(str(page)))
         driver.implicitly_wait(3)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -28,6 +30,7 @@ def search_amazon(driver, prd_name, num_of_products):
         rank = 1
         for i in range(num_of_products):
             product = {}
+            product["id"] = id
             item = results[i]
             atag = item.h2.a
             product_url = 'https://www.amazon.in/' + atag.get('href')
