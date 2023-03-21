@@ -78,6 +78,38 @@ paths:
                 $ref: '#/components/schemas/SearchTerm'
         '405':
           description: Invalid input
+  /integrate:
+    post:
+      tags:
+        - Integrate
+      summary: Integrated method
+      description: Integrated method
+      operationId: controllers.controllers.integrate_all
+      requestBody:
+        description: Integrated all
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchTerm'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SearchTerm'
+        '405':
+          description: Invalid input
   /extract_keywords:
     post:
       tags:
