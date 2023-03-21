@@ -17,12 +17,9 @@ def get_url(search_product):
     return url
 
 
-def search_amazon(driver, prd_name, num_of_products):
-    final_output = []
-    search_url = get_url(prd_name)
-    id = 0
+def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
+    search_url = get_url(search_phrase)
     for page in range(1):
-        id += 1
         driver.get(search_url.format(str(page)))
         driver.implicitly_wait(3)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -30,11 +27,14 @@ def search_amazon(driver, prd_name, num_of_products):
         rank = 1
         for i in range(num_of_products):
             product = {}
-            product["id"] = id
-            item = results[i]
-            atag = item.h2.a
-            product_url = 'https://www.amazon.in/' + atag.get('href')
-            driver.get(product_url)
+            product["id"] = sp_id
+    
+            if results and results[i]:
+                atag = results[i].h2.a 
+                product_url = 'https://www.amazon.in/' + atag.get('href')
+                driver.get(product_url)
+                product["url"] = product_url
+
             driver.implicitly_wait(3)
             product_soup = BeautifulSoup(driver.page_source, 'html.parser')
             prd_title = ""
@@ -60,7 +60,7 @@ def search_amazon(driver, prd_name, num_of_products):
 
                 product["details"] = details
             except:
-                print(prd_name, ": Product Details not present")
+                print(search_phrase, ": Product Details not present")
             try:
                 brand = details[details.rfind("Brand-") + len("Brand-"):details.find("|")]
                 product["brand"] = brand
@@ -81,19 +81,18 @@ def search_amazon(driver, prd_name, num_of_products):
             except:
                 print("Product Price Not Available")
             
-            product["url"] = product_url
-            product["name"] = prd_name
             product["rank"] = str(rank)
 
-            final_output.append(product)
+            final_output[search_phrase].append(product)
 
             rank += 1
 
     return final_output
 
-
-def create_output_file(input_file_name, headless, sss: str=None, num_of_products: int=10):
-    out = []
+# TODO: Fix the order of parameters
+def create_output_file(headless=True, sss: str=None, num_of_products: int=10):
+    out = {}
+    sp_id = 0
 
     chromeOptions = Options()
     chromeOptions.headless = headless
@@ -102,15 +101,10 @@ def create_output_file(input_file_name, headless, sss: str=None, num_of_products
 
     # stripped_search_strings is empty, so read search strings from xlsx
     if sss:
-        for s in sss:
-            out += search_amazon(driver, s, num_of_products)
+        for sp in sss:
+            sp_id += 1
+            out[sp] = []
+            search_amazon(driver, sp, sp_id, num_of_products, out)
     else:
-        wb = xlrd.open_workbook(input_file_name)
-        sheet = wb.sheet_by_index(0)
-        sheet.cell_value(0, 0)
-
-        for i in range(1, sheet.nrows):
-            print("Extracting for -> ", str(sheet.cell_value(i, 1)))
-            out += search_amazon(driver, str(sheet.cell_value(i, 1)), num_of_products)
-
+        out["Error"] = "Please enter a search phrase!"
     return out
