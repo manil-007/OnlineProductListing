@@ -33,8 +33,7 @@ def run_post(username: str = "vatsaaa"):
     stripped_search_strings = [s.strip() for s in search_strings]
     num_of_products = request.get_json()["num_of_products"]
 
-    output = create_output_file(cfg["app"]["input_file_name"],
-                                cfg["app"]["headless"],
+    output = create_output_file(cfg["app"]["headless"],
                                 stripped_search_strings,
                                 num_of_products
                                 )
@@ -93,5 +92,56 @@ def keywords_to_text():
 
     return jsonify(response)
 
-def generate_title():
-    pass
+def integrate_all():
+    new_op = {}
+
+    ## 1. Use search phrases for finding relevant products and their attributes 
+    search_strings = request.get_json()["search_string"].split(";")
+    stripped_search_strings = [s.strip() for s in search_strings]
+    num_of_products = request.get_json()["num_of_products"]
+
+    output = create_output_file(cfg["app"]["headless"],
+                                stripped_search_strings,
+                                num_of_products
+                                )
+    
+    ## 2. For each search phrase, we want the keywords from title and keywords from descrition
+    for sp in stripped_search_strings:
+        for item in output[sp]:
+            # Being defensive, for instances where 'title' was not found
+            if item and item["title"]:
+                title_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["title"]
+            
+                title_response = completion_with_backoff(model="text-davinci-003",
+                                       prompt="\"\"\"\n" + title_prompt + "\n\"\"\"",
+                                       temperature=0.7,
+                                       max_tokens=1024,
+                                       top_p=1.0,
+                                       frequency_penalty=0.0,
+                                       presence_penalty=0.0,
+                                       stop=["\"\"\""]
+                                       )
+            
+                # TODO: Failure / Success checks
+            
+            # Being defensive, for instances where 'description' was not found
+            if item and item["description"]:
+                description_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["description"]
+            
+                description_response = completion_with_backoff(model="text-davinci-003",
+                                       prompt="\"\"\"\n" + description_prompt + "\n\"\"\"",
+                                       temperature=0.7,
+                                       max_tokens=1024,
+                                       top_p=1.0,
+                                       frequency_penalty=0.0,
+                                       presence_penalty=0.0,
+                                       stop=["\"\"\""]
+                                       )
+            
+                # TODO: Failure / Success checks
+    
+        new_op[sp] = {}
+        new_op[sp]["title_keywords"] = title_response["choices"]["text"]
+        new_op[sp]["description_keywords"] = description_response["choices"]["text"]
+    
+    return new_op
