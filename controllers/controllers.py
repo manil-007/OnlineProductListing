@@ -42,8 +42,7 @@ def run_post(username: str = "vatsaaa"):
     # Prepare response before returning
     response = jsonify(output)
     response.status_code = 200
-
-    print(response.data)
+    response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
 
@@ -61,6 +60,7 @@ def extract_keywords():
                                        stop=["\"\"\""]
                                        )
     response.status_code = 200
+    response.headers.add('Access-Control-Allow-Origin', '*')
  
     return jsonify(response)
 
@@ -90,6 +90,7 @@ def keywords_to_text():
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
+    response.headers.add('Access-Control-Allow-Origin', '*')
 
     return jsonify(response)
 
