@@ -10,7 +10,7 @@ import pandas as pd
 
 
 def get_url(search_product):
-    template = 'https://www.amazon.in/s?k={}&ref=nb_sb_noss_1'
+    template = 'https://www.amazon.in/s?k={}'
     search_product = search_product.replace(' ', '+')
     url = template.format(search_product)
     url += '&page={}'

@@ -1,14 +1,14 @@
-import os
 from pathlib import Path
 from datetime import datetime as dt
 
 from flask import jsonify, request
 from flask_cors import cross_origin
-from tenacity import retry, stop_after_attempt, wait_random_exponential
+
 import tiktoken
 import openai
+from tenacity import retry, stop_after_attempt, wait_random_exponential
 
-from config.config import cfg
+from config.config import cfg, app
 from utils.utils import create_output_file
 from utils.ProvisionOpenAI import ProvisionOpenAI
 
@@ -25,9 +25,8 @@ def ping(username: str, suffix: str = None):
 
     return pong
 
-
-# Write Python function to tokenize a semicolon separated string
-
+@app.app.route("/run", methods=["POST"])
+@cross_origin()
 def run_post(username: str = "vatsaaa"):
     search_strings = request.get_json()["search_string"].split(";")
     stripped_search_strings = [s.strip() for s in search_strings]
@@ -70,11 +69,9 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
     num_tokens = len(encoding.encode(string))
     return num_tokens
 
-
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
 def completion_with_backoff(**kwargs):
     return openai.Completion.create(**kwargs)
-
 
 def keywords_to_text():
     keywords = request.get_json()
@@ -89,7 +86,8 @@ def keywords_to_text():
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
-
+    response.status_code = 200 
+    
     return jsonify(response)
 
 def integrate_all():

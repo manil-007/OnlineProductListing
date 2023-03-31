@@ -29,5 +29,4 @@ cfg = {
 
 app = connexion.App(__name__, specification_dir="./")
 app.add_api("swagger.yml")
-
-CORS(app.app, origins="*", allow_headers="*")
+CORS(app.app)
