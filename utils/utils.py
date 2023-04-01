@@ -1,13 +1,19 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import *
-import xlrd
 from bs4 import BeautifulSoup
-import csv, json
-from config.config import cfg
-from datetime import datetime
-import pandas as pd
 
+import tiktoken
+import openai
+
+from tenacity import retry, stop_after_attempt, wait_random_exponential
+
+from config.config import cfg
+from utils.ProvisionOpenAI import ProvisionOpenAI
+
+ProvisionOpenAI.set_api_key(cfg["openapi"]["secret"])
+
+openai.api_key = ProvisionOpenAI.get_api_key()
 
 def get_url(search_product):
     template = 'https://www.amazon.in/s?k={}'
@@ -108,3 +114,13 @@ def create_output_file(headless=True, sss: str=None, num_of_products: int=10):
     else:
         out["Error"] = "Please enter a search phrase!"
     return out
+
+def num_tokens_from_string(string: str, encoding_name: str) -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
+
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
+def completion_with_backoff(**kwargs):
+    return openai.Completion.create(**kwargs)

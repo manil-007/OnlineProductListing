@@ -4,19 +4,10 @@ from datetime import datetime as dt
 from flask import jsonify, request
 from flask_cors import cross_origin
 
-import tiktoken
-import openai
-from tenacity import retry, stop_after_attempt, wait_random_exponential
-
 from config.config import cfg, app
-from utils.utils import create_output_file
-from utils.ProvisionOpenAI import ProvisionOpenAI
+from utils.utils import create_output_file, completion_with_backoff
 
-ProvisionOpenAI.set_api_key(cfg["openapi"]["secret"])
-
-openai.api_key = ProvisionOpenAI.get_api_key()
-
-
+@app.app.route("/ping", methods=["GET"])
 def ping(username: str, suffix: str = None):
     resp = {"who": username, "at": dt.now().strftime("%Y-%m-%d, %H:%M:%S"), "suffix": suffix}
 
@@ -25,9 +16,9 @@ def ping(username: str, suffix: str = None):
 
     return pong
 
-@app.app.route("/run", methods=["POST"])
+@app.app.route("/getproducts", methods=["POST"])
 @cross_origin()
-def run_post(username: str = "vatsaaa"):
+def get_products_for_search_phrases(username: str = "vatsaaa"):
     search_strings = request.get_json()["search_string"].split(";")
     stripped_search_strings = [s.strip() for s in search_strings]
     num_of_products = request.get_json()["num_of_products"]
@@ -41,11 +32,11 @@ def run_post(username: str = "vatsaaa"):
     response = jsonify(output)
     response.status_code = 200
 
-    print(response.data)
-
     return response
 
-def extract_keywords():
+@app.app.route("/getkeywords", methods=["POST"])
+@cross_origin()
+def get_keywords_for_text():
     text = request.get_json()["keywords_text"]
     prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + text
 
@@ -62,18 +53,9 @@ def extract_keywords():
  
     return jsonify(response)
 
-
-def num_tokens_from_string(string: str, encoding_name: str) -> int:
-    """Returns the number of tokens in a text string."""
-    encoding = tiktoken.get_encoding(encoding_name)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
-
-@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
-def completion_with_backoff(**kwargs):
-    return openai.Completion.create(**kwargs)
-
-def keywords_to_text():
+@app.app.route("/buildtext", methods=["POST"])
+@cross_origin()
+def build_text_from_keywords():
     keywords = request.get_json()
     prompt = Path("config/prompt_for_building_text.txt").read_text() + ",".join(keywords)
 
@@ -90,7 +72,9 @@ def keywords_to_text():
     
     return jsonify(response)
 
-def integrate_all():
+@app.app.route("/getlistings", methods=["POST"])
+@cross_origin()
+def get_listings():
     new_op = {}
 
     ## 1. Use search phrases for finding relevant products and their attributes 
