@@ -1,8 +1,11 @@
 from pathlib import Path
 from datetime import datetime as dt
 
-from flask import jsonify, request
+from flask import jsonify, request, wrappers
 from flask_cors import cross_origin
+
+import openai
+from tenacity import RetryError
 
 from config.config import cfg, app
 from utils.utils import create_output_file, completion_with_backoff
@@ -40,7 +43,10 @@ def get_keywords_for_text():
     text = request.get_json()["keywords_text"]
     prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + text
 
-    response = completion_with_backoff(model="text-davinci-003",
+    response = None
+    
+    try:
+        response = completion_with_backoff(model="text-davinci-003",
                                        prompt="\"\"\"\n" + prompt + "\n\"\"\"",
                                        temperature=0.7,
                                        max_tokens=1024,
@@ -49,8 +55,11 @@ def get_keywords_for_text():
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
-    response.status_code = 200
- 
+    except openai.OpenAIError as eoai: 
+        print("OpenAIError: " + eoai.user_message)
+    except RetryError as ere:
+        print("RetryError: A possible error OpenAI API error occurred!!")
+
     return jsonify(response)
 
 @app.app.route("/buildtext", methods=["POST"])
@@ -59,7 +68,10 @@ def build_text_from_keywords():
     keywords = request.get_json()
     prompt = Path("config/prompt_for_building_text.txt").read_text() + ",".join(keywords)
 
-    response = completion_with_backoff(model="text-davinci-003",
+    response = None
+
+    try:
+        response = completion_with_backoff(model="text-davinci-003",
                                        prompt="\"\"\"\n" + prompt + "\n\"\"\"",
                                        temperature=0.7,
                                        max_tokens=1024,
@@ -68,7 +80,12 @@ def build_text_from_keywords():
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
-    response.status_code = 200 
+    except openai.OpenAIError as eoai: 
+        print("OpenAIError: " + eoai.user_message)
+    except RetryError as ere:
+        print("RetryError: A possible error OpenAI API error occurred!!")
+    else:
+        response.status_code = 200
     
     return jsonify(response)
 
@@ -93,8 +110,10 @@ def get_listings():
             # Being defensive, for instances where 'title' was not found
             if item and item["title"]:
                 title_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["title"]
-            
-                title_response = completion_with_backoff(model="text-davinci-003",
+
+                title_response = None
+                try:
+                    title_response = completion_with_backoff(model="text-davinci-003",
                                        prompt="\"\"\"\n" + title_prompt + "\n\"\"\"",
                                        temperature=0.7,
                                        max_tokens=1024,
@@ -103,14 +122,21 @@ def get_listings():
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
+                except openai.OpenAIError as eoai: 
+                    print("OpenAIError: " + eoai.user_message)
+                except RetryError as ere:
+                    print("RetryError: A possible error OpenAI API error occurred!!")
+                else:
+                    title_response.status_code = 200
             
-                # TODO: Failure / Success checks
             
             # Being defensive, for instances where 'description' was not found
             if item and item["description"]:
                 description_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["description"]
-            
-                description_response = completion_with_backoff(model="text-davinci-003",
+
+                description_response = None
+                try:
+                    description_response = completion_with_backoff(model="text-davinci-003",
                                        prompt="\"\"\"\n" + description_prompt + "\n\"\"\"",
                                        temperature=0.7,
                                        max_tokens=1024,
@@ -119,8 +145,12 @@ def get_listings():
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
-            
-                # TODO: Failure / Success checks
+                except openai.OpenAIError as eoai: 
+                    print("OpenAIError: " + eoai.user_message)
+                except RetryError as ere:
+                    print("RetryError: A possible error OpenAI API error occurred!!")
+                else:
+                    description_response.status_code = 200
     
         new_op[sp] = {}
         new_op[sp]["title_keywords"] = title_response["choices"]["text"]
