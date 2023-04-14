@@ -106,7 +106,10 @@ def get_listings():
                                 num_of_products
                                 )
     
-    ## 2. For each search phrase, we want the keywords from title and keywords from descrition
+    ## 2. For each search phrase, we want the keywords from title and keywords from description
+    ## TODO: Make Title and Description keyword extraction based on a configuration flag passed
+    ## If the title_keywords_required is TRUE then extract keywords from title
+    ## Similarly, when desc_keywords_required flag is TRUE extract keywords from description
     for sp in stripped_search_strings:
         for item in output[sp]:
             # Being defensive, for instances where 'title' was not found
@@ -154,8 +157,23 @@ def get_listings():
                 else:
                     description_response.status_code = 200
     
+        ## TODO: For a given 'sp' loop will run for multiple times. So, append 
+        ## title_response["choices"][0]["text"] to new_op[sp]["title_keywords"]
+        ## Also, ensure that only unique keywords are in new_op[sp]["title_keywords"]
+        ## Similarly, handle new_op[sp]["description_keywords"] too
+        ## Ensure that these are set in their respective handling flags only
         new_op[sp] = {}
         new_op[sp]["title_keywords"] = title_response["choices"][0]["text"]
         new_op[sp]["description_keywords"] = description_response["choices"][0]["text"]
+    
+    ## 3. Now for each 'sp' build new title using new_op[sp]["title_keywords"]
+    ## and build new description using new_op[sp]["description_keywords"]
+    ## Ensure that these are set in their respective handling flags only
+    ## new_op[sp]["suggested_title"] = "New title that ChatGPT api returns
+    ## new_op[sp]["suggested_description"] = "New description that ChatGPT api returns
+    
+    ## 4. We need to ensure that the dictionary is mapping correctly as that on UI
+    
+    ## 5. Call tested functions built and tested instead of the spread out code
     
     return new_op
