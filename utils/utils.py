@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import *
 from bs4 import BeautifulSoup
+import xlrd
 
 import tiktoken
 import openai
@@ -96,7 +97,7 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
     return final_output
 
 # TODO: Fix the order of parameters
-def create_output_file(headless=True, sss: str=None, num_of_products: int=10):
+def create_output_file(headless, input_file_name: str=None, sss: str=None, num_of_products: int=10):
     out = {}
     sp_id = 0
 
@@ -112,7 +113,15 @@ def create_output_file(headless=True, sss: str=None, num_of_products: int=10):
             out[sp] = []
             search_amazon(driver, sp, sp_id, num_of_products, out)
     else:
-        out["Error"] = "Please enter a search phrase!"
+        wb = xlrd.open_workbook(input_file_name)
+        sheet = wb.sheet_by_index(0)
+        sheet.cell_value(0, 0)
+
+        for i in range(1, sheet.nrows):
+            sp = str(sheet.cell_value(i, 1))
+            sp_id = +1
+            out[sp] = []
+            search_amazon(driver, sp, sp_id, num_of_products, out)
     return out
 
 def num_tokens_from_string(string: str, encoding_name: str) -> int:

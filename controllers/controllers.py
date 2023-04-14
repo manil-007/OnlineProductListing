@@ -27,10 +27,11 @@ def get_products_for_search_phrases(username: str = "vatsaaa"):
     num_of_products = request.get_json()["num_of_products"]
 
     output = create_output_file(cfg["app"]["headless"],
+                                None,
                                 stripped_search_strings,
                                 num_of_products
                                 )
-    
+
     # Prepare response before returning
     response = jsonify(output)
     response.status_code = 200
@@ -100,6 +101,7 @@ def get_listings():
     num_of_products = request.get_json()["num_of_products"]
 
     output = create_output_file(cfg["app"]["headless"],
+                                None,
                                 stripped_search_strings,
                                 num_of_products
                                 )
