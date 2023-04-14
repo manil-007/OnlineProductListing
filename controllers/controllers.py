@@ -27,10 +27,11 @@ def get_products_for_search_phrases(username: str = "vatsaaa"):
     num_of_products = request.get_json()["num_of_products"]
 
     output = create_output_file(cfg["app"]["headless"],
+                                None,
                                 stripped_search_strings,
                                 num_of_products
                                 )
-    
+
     # Prepare response before returning
     response = jsonify(output)
     response.status_code = 200
@@ -100,13 +101,20 @@ def get_listings():
     num_of_products = request.get_json()["num_of_products"]
 
     output = create_output_file(cfg["app"]["headless"],
+                                None,
                                 stripped_search_strings,
                                 num_of_products
                                 )
-    
-    ## 2. For each search phrase, we want the keywords from title and keywords from descrition
+
+    ## 2. For each search phrase, we want the keywords from title and keywords from description
+    ## TODO: Make Title and Description keyword extraction based on a configuration flag passed
+    ## If the title_keywords_required is TRUE then extract keywords from title
+    ## Similarly, when desc_keywords_required flag is TRUE extract keywords from description
     for sp in stripped_search_strings:
+        new_op[sp] = {}
         for item in output[sp]:
+            title_keywords = []
+            description_keywords = []
             # Being defensive, for instances where 'title' was not found
             if item and item["title"]:
                 title_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["title"]
@@ -126,9 +134,6 @@ def get_listings():
                     print("OpenAIError: " + eoai.user_message)
                 except RetryError as ere:
                     print("RetryError: A possible error OpenAI API error occurred!!")
-                else:
-                    title_response.status_code = 200
-            
             
             # Being defensive, for instances where 'description' was not found
             if item and item["description"]:
@@ -149,11 +154,52 @@ def get_listings():
                     print("OpenAIError: " + eoai.user_message)
                 except RetryError as ere:
                     print("RetryError: A possible error OpenAI API error occurred!!")
-                else:
-                    description_response.status_code = 200
+
+                title_keywords += title_response["choices"][0]["text"]
+                description_keywords += description_response["choices"][0]["text"]
+
+            new_op[sp]["title_keywords"] = list(set(title_keywords))
+            new_op[sp]["description_keywords"] = list(set(description_keywords))
+
+        suggested_title_response = None
+        suggested_title_prompt = Path("config/prompt_for_building_text.txt").read_text() + new_op[sp]["title_keywords"]
+        try:
+            suggested_title_response = completion_with_backoff(model="text-davinci-003",
+                                                     prompt="\"\"\"\n" + suggested_title_prompt + "\n\"\"\"",
+                                                     temperature=0.7,
+                                                     max_tokens=1024,
+                                                     top_p=1.0,
+                                                     frequency_penalty=0.0,
+                                                     presence_penalty=0.0,
+                                                     stop=["\"\"\""]
+                                                     )
+        except openai.OpenAIError as eoai:
+            print("OpenAIError: " + eoai.user_message)
+        except RetryError as ere:
+            print("RetryError: A possible error OpenAI API error occurred!!")
+
+        suggested_description_response = None
+        suggested_description_prompt = Path("config/prompt_for_building_text.txt").read_text() + new_op[sp]["description_keywords"]
+        try:
+            suggested_description_response = completion_with_backoff(model="text-davinci-003",
+                                                               prompt="\"\"\"\n" + suggested_description_prompt + "\n\"\"\"",
+                                                               temperature=0.7,
+                                                               max_tokens=1024,
+                                                               top_p=1.0,
+                                                               frequency_penalty=0.0,
+                                                               presence_penalty=0.0,
+                                                               stop=["\"\"\""]
+                                                               )
+        except openai.OpenAIError as eoai:
+            print("OpenAIError: " + eoai.user_message)
+        except RetryError as ere:
+            print("RetryError: A possible error OpenAI API error occurred!!")
+
+        new_op[sp]["suggested_title"] = suggested_title_response
+        new_op[sp]["suggested_description"] = suggested_description_response
     
-        new_op[sp] = {}
-        new_op[sp]["title_keywords"] = title_response["choices"]["text"]
-        new_op[sp]["description_keywords"] = description_response["choices"]["text"]
+    ## 4. We need to ensure that the dictionary is mapping correctly as that on UI
+    
+    ## 5. Call tested functions built and tested instead of the spread out code
     
     return new_op

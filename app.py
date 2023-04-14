@@ -3,7 +3,7 @@ import getopt, sys
 
 # Project module imports
 from config.config import cfg
-from src.utils import create_output_file
+from utils.utils import create_output_file
 
 def usage(file=sys.stdout):
     print("python app.py [-h | -u]", file=file)
@@ -29,7 +29,7 @@ def main(argumentList):
         # output error, and return with an error code
         print (str(err))
 
-    create_output_file(cfg["app"]["input_file_name"], cfg["app"]["output_file_name"], headless=headless_mode)
+    create_output_file(headless_mode, cfg["app"]["input_file_name"], None, cfg["app"]["number_of_products"])
 
 
 if __name__ == '__main__':

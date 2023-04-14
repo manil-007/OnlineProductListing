@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import *
 from bs4 import BeautifulSoup
+import xlrd
 
 import tiktoken
 import openai
@@ -55,6 +56,7 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 product["title"] = prd_title
             except:
                 print("Product Title Not Available")
+                product["title"] = ""
             try:
                 for row in product_details.tbody.find_all("tr"):
                     columns = row.find_all("td")
@@ -67,11 +69,13 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 product["details"] = details
             except:
                 print(search_phrase, ": Product Details not present")
+                product["details"] = ""
             try:
                 brand = details[details.rfind("Brand-") + len("Brand-"):details.find("|")]
                 product["brand"] = brand
             except:
                 print("Product Brand not present")
+                product["brand"] = ""
             try:
                 des = product_soup.find("div", {"id": "feature-bullets"}).find("ul")
                 prd_des = ""
@@ -81,11 +85,13 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 product["description"] = prd_des
             except:
                 print("Product Description not present")
+                product["description"] = ""
             try:
                 price = product_soup.find("span", {"class": "a-price-whole"}).text
                 product["price"] = price
             except:
                 print("Product Price Not Available")
+                product["price"] = ""
             
             product["rank"] = str(rank)
 
@@ -96,7 +102,7 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
     return final_output
 
 # TODO: Fix the order of parameters
-def create_output_file(headless=True, sss: str=None, num_of_products: int=10):
+def create_output_file(headless, input_file_name: str=None, sss: str=None, num_of_products: int=10):
     out = {}
     sp_id = 0
 
@@ -112,7 +118,15 @@ def create_output_file(headless=True, sss: str=None, num_of_products: int=10):
             out[sp] = []
             search_amazon(driver, sp, sp_id, num_of_products, out)
     else:
-        out["Error"] = "Please enter a search phrase!"
+        wb = xlrd.open_workbook(input_file_name)
+        sheet = wb.sheet_by_index(0)
+        sheet.cell_value(0, 0)
+
+        for i in range(1, sheet.nrows):
+            sp = str(sheet.cell_value(i, 1))
+            sp_id = +1
+            out[sp] = []
+            search_amazon(driver, sp, sp_id, num_of_products, out)
     return out
 
 def num_tokens_from_string(string: str, encoding_name: str) -> int:
@@ -121,6 +135,6 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
     num_tokens = len(encoding.encode(string))
     return num_tokens
 
-@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(60))
 def completion_with_backoff(**kwargs):
     return openai.Completion.create(**kwargs)
