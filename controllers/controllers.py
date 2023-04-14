@@ -155,7 +155,7 @@ def get_listings():
                     description_response.status_code = 200
     
         new_op[sp] = {}
-        new_op[sp]["title_keywords"] = title_response["choices"]["text"]
-        new_op[sp]["description_keywords"] = description_response["choices"]["text"]
+        new_op[sp]["title_keywords"] = title_response["choices"][0]["text"]
+        new_op[sp]["description_keywords"] = description_response["choices"][0]["text"]
     
     return new_op

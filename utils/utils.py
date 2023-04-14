@@ -56,6 +56,7 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 product["title"] = prd_title
             except:
                 print("Product Title Not Available")
+                product["title"] = ""
             try:
                 for row in product_details.tbody.find_all("tr"):
                     columns = row.find_all("td")
@@ -68,11 +69,13 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 product["details"] = details
             except:
                 print(search_phrase, ": Product Details not present")
+                product["details"] = ""
             try:
                 brand = details[details.rfind("Brand-") + len("Brand-"):details.find("|")]
                 product["brand"] = brand
             except:
                 print("Product Brand not present")
+                product["brand"] = ""
             try:
                 des = product_soup.find("div", {"id": "feature-bullets"}).find("ul")
                 prd_des = ""
@@ -82,11 +85,13 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 product["description"] = prd_des
             except:
                 print("Product Description not present")
+                product["description"] = ""
             try:
                 price = product_soup.find("span", {"class": "a-price-whole"}).text
                 product["price"] = price
             except:
                 print("Product Price Not Available")
+                product["price"] = ""
             
             product["rank"] = str(rank)
 
@@ -130,6 +135,6 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
     num_tokens = len(encoding.encode(string))
     return num_tokens
 
-@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(60))
 def completion_with_backoff(**kwargs):
     return openai.Completion.create(**kwargs)
