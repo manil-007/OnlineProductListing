@@ -138,3 +138,8 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(60))
 def completion_with_backoff(**kwargs):
     return openai.Completion.create(**kwargs)
+
+def trimList(keywords):
+    list_of_keywords = [sub.replace("\n", "") for sub in keywords]
+    list_of_keywords = [sub.strip() for sub in list_of_keywords]
+    return list_of_keywords

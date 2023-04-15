@@ -8,7 +8,7 @@ import openai
 from tenacity import RetryError
 
 from config.config import cfg, app
-from utils.utils import create_output_file, completion_with_backoff
+from utils.utils import create_output_file, completion_with_backoff, trimList
 
 @app.app.route("/ping", methods=["GET"])
 def ping(username: str, suffix: str = None):
@@ -180,8 +180,6 @@ def get_listings():
 
         suggested_description_response = None
 
-        print("Title Keywords:", new_op[sp]["title_keywords"])
-
         suggested_description_prompt = Path("config/prompt_for_building_text.txt").read_text() + str(new_op[sp]["description_keywords"])
         try:
             suggested_description_response = completion_with_backoff(model="text-davinci-003",
@@ -200,9 +198,9 @@ def get_listings():
 
         new_op[sp]["title"] = suggested_title_response.choices[0].text
         new_op[sp]["details"] = suggested_description_response.choices[0].text
-        new_op[sp]["keywords"] = list(set(new_op[sp]["title_keywords"] + new_op[sp]["description_keywords"]))
+        new_op[sp]["keywords"] = list(set(trimList(new_op[sp]["title_keywords"] + new_op[sp]["description_keywords"])))
+        print("Title Keywords:", new_op[sp]["keywords"])
 
-    print()    
     ## 4. We need to ensure that the dictionary is mapping correctly as that on UI
     
     ## 5. Call tested functions built and tested instead of the spread out code
