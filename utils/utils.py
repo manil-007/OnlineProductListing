@@ -30,32 +30,29 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
         driver.get(search_url.format(str(page)))
         driver.implicitly_wait(3)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
+
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
         rank = 1
         for i in range(num_of_products):
             product = {}
             product["id"] = sp_id
-    
+
             if results and results[i]:
                 atag = results[i].h2.a 
                 product_url = 'https://www.amazon.in/' + atag.get('href')
                 driver.get(product_url)
                 product["url"] = product_url
 
-            driver.implicitly_wait(3)
+            driver.implicitly_wait(5)
             product_soup = BeautifulSoup(driver.page_source, 'html.parser')
-            prd_title = ""
-            brand = ""
             details = ""
-            prd_des = ""
-            price = ""
             product_details = product_soup.find("table", {"class": "a-normal a-spacing-micro"})
 
             try:
                 prd_title = product_soup.find("span", {"id": "productTitle"}).text.strip()
                 product["title"] = prd_title
             except:
-                print("Product Title Not Available")
+                print(search_phrase, ": Product Title Not Available")
                 product["title"] = ""
             try:
                 for row in product_details.tbody.find_all("tr"):
@@ -74,7 +71,7 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 brand = details[details.rfind("Brand-") + len("Brand-"):details.find("|")]
                 product["brand"] = brand
             except:
-                print("Product Brand not present")
+                print(search_phrase, ": Product Brand not present")
                 product["brand"] = ""
             try:
                 des = product_soup.find("div", {"id": "feature-bullets"}).find("ul")
@@ -84,13 +81,13 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 
                 product["description"] = prd_des
             except:
-                print("Product Description not present")
+                print(search_phrase, ": Product Description not present")
                 product["description"] = ""
             try:
                 price = product_soup.find("span", {"class": "a-price-whole"}).text
                 product["price"] = price
             except:
-                print("Product Price Not Available")
+                print(search_phrase, ": Product Price Not Available")
                 product["price"] = ""
             
             product["rank"] = str(rank)
@@ -101,7 +98,6 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
 
     return final_output
 
-# TODO: Fix the order of parameters
 def create_output_file(headless, input_file_name: str=None, sss: str=None, num_of_products: int=10):
     out = {}
     sp_id = 0
@@ -143,3 +139,9 @@ def trimList(keywords):
     list_of_keywords = [sub.replace("\n", "") for sub in keywords]
     list_of_keywords = [sub.strip() for sub in list_of_keywords]
     return list_of_keywords
+
+def trimText(data):
+    trimData = data.replace("\n", "").replace('"', '')
+    trimData = trimData.strip()
+    return trimData
+

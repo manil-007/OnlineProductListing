@@ -8,7 +8,7 @@ import openai
 from tenacity import RetryError
 
 from config.config import cfg, app
-from utils.utils import create_output_file, completion_with_backoff, trimList
+from utils.utils import create_output_file, completion_with_backoff, trimList, trimText
 
 @app.app.route("/ping", methods=["GET"])
 def ping(username: str, suffix: str = None):
@@ -67,7 +67,7 @@ def get_keywords_for_text():
 @cross_origin()
 def build_text_from_keywords():
     keywords = request.get_json()
-    prompt = Path("config/prompt_for_building_text.txt").read_text() + ",".join(keywords)
+    prompt = Path("config/prompt_for_building_description_text.txt").read_text() + ",".join(keywords)
 
     response = None
 
@@ -112,92 +112,95 @@ def get_listings():
     ## Similarly, when desc_keywords_required flag is TRUE extract keywords from description
     for sp in stripped_search_strings:
         new_op[sp] = {}
+        title_keywords = []
+        description_keywords = []
         for item in output[sp]:
-            title_keywords = []
-            description_keywords = []
             # Being defensive, for instances where 'title' was not found
             if item and item["title"]:
                 title_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["title"]
 
-                title_response = None
                 try:
                     title_response = completion_with_backoff(model="text-davinci-003",
                                        prompt="\"\"\"\n" + title_prompt + "\n\"\"\"",
-                                       temperature=0.5,
+                                       temperature=0.4,
                                        max_tokens=1024,
                                        top_p=1.0,
                                        frequency_penalty=0.0,
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
+                    title_keywords += (title_response["choices"][0]["text"].replace(item["brand"], "")).split(",")
                 except openai.OpenAIError as eoai: 
                     print("OpenAIError: " + eoai.user_message)
                 except RetryError as ere:
                     print("RetryError: A possible error OpenAI API error occurred!!")
-            
+
             # Being defensive, for instances where 'description' was not found
             if item and item["description"]:
                 description_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["description"]
 
-                description_response = None
                 try:
                     description_response = completion_with_backoff(model="text-davinci-003",
                                        prompt="\"\"\"\n" + description_prompt + "\n\"\"\"",
-                                       temperature=0.5,
+                                       temperature=0.4,
                                        max_tokens=1024,
                                        top_p=1.0,
                                        frequency_penalty=0.0,
                                        presence_penalty=0.0,
                                        stop=["\"\"\""]
                                        )
+                    description_keywords += (description_response["choices"][0]["text"].replace(item["brand"], "")).split(",")
                 except openai.OpenAIError as eoai: 
                     print("OpenAIError: " + eoai.user_message)
                 except RetryError as ere:
                     print("RetryError: A possible error OpenAI API error occurred!!")
 
-                title_keywords += (title_response["choices"][0]["text"]).split(",")
-                description_keywords += (description_response["choices"][0]["text"]).split(",")
+        new_op[sp]["title_keywords"] = trimList(list(set(title_keywords)))
+        new_op[sp]["description_keywords"] = trimList(list(set(description_keywords)))
 
-            new_op[sp]["title_keywords"] = list(set(title_keywords))
-            new_op[sp]["description_keywords"] = list(set(description_keywords))
+        if len(new_op[sp]["title_keywords"]) > 0:
+            try:
+                suggested_title_prompt = Path("config/prompt_for_building_title_text.txt").read_text() + str(
+                    new_op[sp]["title_keywords"])
+                suggested_title_response = completion_with_backoff(model="text-davinci-003",
+                                                        prompt="\"\"\"\n" + suggested_title_prompt + "\n\"\"\"",
+                                                        temperature=0.4,
+                                                        max_tokens=1024,
+                                                        top_p=1.0,
+                                                        frequency_penalty=0.0,
+                                                        presence_penalty=0.0,
+                                                        stop=["\"\"\""]
+                                                        )
+                new_op[sp]["title"] = trimText(suggested_title_response.choices[0].text)
+            except openai.OpenAIError as eoai:
+                print("OpenAIError: " + eoai.user_message)
+            except RetryError as ere:
+                print("RetryError: A possible error OpenAI API error occurred!!")
+        else:
+            new_op[sp]["title"] = ""
 
-        suggested_title_response = None
-        suggested_title_prompt = Path("config/prompt_for_building_text.txt").read_text() + str(new_op[sp]["title_keywords"])
-        try:
-            suggested_title_response = completion_with_backoff(model="text-davinci-003",
-                                                     prompt="\"\"\"\n" + suggested_title_prompt + "\n\"\"\"",
-                                                     temperature=0.5,
-                                                     max_tokens=1024,
-                                                     top_p=1.0,
-                                                     frequency_penalty=0.0,
-                                                     presence_penalty=0.0,
-                                                     stop=["\"\"\""]
-                                                     )
-        except openai.OpenAIError as eoai:
-            print("OpenAIError: " + eoai.user_message)
-        except RetryError as ere:
-            print("RetryError: A possible error OpenAI API error occurred!!")
+        if len(new_op[sp]["description_keywords"]) > 0:
+            try:
+                suggested_description_prompt = Path(
+                    "config/prompt_for_building_description_text.txt").read_text() + str(
+                    new_op[sp]["description_keywords"])
+                suggested_description_response = completion_with_backoff(model="text-davinci-003",
+                                                                prompt="\"\"\"\n" + suggested_description_prompt + "\n\"\"\"",
+                                                                temperature=0.4,
+                                                                max_tokens=1024,
+                                                                top_p=1.0,
+                                                                frequency_penalty=0.0,
+                                                                presence_penalty=0.0,
+                                                                stop=["\"\"\""]
+                                                                )
+                new_op[sp]["details"] = trimText(suggested_description_response.choices[0].text)
+            except openai.OpenAIError as eoai:
+                print("OpenAIError: " + eoai.user_message)
+            except RetryError as ere:
+                print("RetryError: A possible error OpenAI API error occurred!!")
+        else:
+            new_op[sp]["details"] = ""
 
-        suggested_description_response = None
-
-        suggested_description_prompt = Path("config/prompt_for_building_text.txt").read_text() + str(new_op[sp]["description_keywords"])
-        try:
-            suggested_description_response = completion_with_backoff(model="text-davinci-003",
-                                                               prompt="\"\"\"\n" + suggested_description_prompt + "\n\"\"\"",
-                                                               temperature=0.5,
-                                                               max_tokens=1024,
-                                                               top_p=1.0,
-                                                               frequency_penalty=0.0,
-                                                               presence_penalty=0.0,
-                                                               stop=["\"\"\""]
-                                                               )
-        except openai.OpenAIError as eoai:
-            print("OpenAIError: " + eoai.user_message)
-        except RetryError as ere:
-            print("RetryError: A possible error OpenAI API error occurred!!")
-
-        new_op[sp]["title"] = suggested_title_response.choices[0].text
-        new_op[sp]["details"] = suggested_description_response.choices[0].text
         new_op[sp]["keywords"] = list(set(trimList(new_op[sp]["title_keywords"] + new_op[sp]["description_keywords"])))
         print("Title Keywords:", new_op[sp]["keywords"])
 
