@@ -46,13 +46,13 @@ paths:
           description: Pet not found
         '405':
           description: Validation exception
-  /run:
+  /getproducts:
     post:
       tags:
-        - run
-      summary: Search and get data
+        - getproducts
+      summary: Get list and details of products which match the search phrases
       description: Search and get data
-      operationId: controllers.controllers.run_post
+      operationId: controllers.controllers.get_products_for_search_phrases
       requestBody:
         description: Seach and get data
         content:
@@ -78,13 +78,45 @@ paths:
                 $ref: '#/components/schemas/SearchTerm'
         '405':
           description: Invalid input
-  /extract_keywords:
+  /getlistings:
+    post:
+      tags:
+        - Get listings
+      summary: Get listings for products that match given search-phrases
+      description: Get listings for products that match given search-phrases
+      operationId: controllers.controllers.get_listings
+      requestBody:
+        description: Integrated all
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchTerm'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SearchTerm'
+        '405':
+          description: Invalid input
+  /getkeywords:
     post:
       tags:
         - extract keywords
       summary: Extract keywords from given text
       description: Extract keywords from given text
-      operationId: controllers.controllers.extract_keywords
+      operationId: controllers.controllers.get_keywords_for_text
       requestBody:
         description: Text from which keywords need to be extracted
         content:
@@ -110,13 +142,13 @@ paths:
                 $ref: '#/components/schemas/KeywordsText'
         '405':
           description: Invalid input
-  /build_text:
+  /buildtext:
     post:
       tags:
         - Build text
       summary: Build SEO text from given keywords
       description: Build SEO text from given keywords
-      operationId: controllers.controllers.keywords_to_text
+      operationId: controllers.controllers.build_text_from_keywords
       requestBody:
         description: Keywords to use for building the SEO text
         content:

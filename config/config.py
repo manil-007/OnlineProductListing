@@ -23,11 +23,10 @@ cfg = {
         }
     },
     "openapi": {
-        "secret": "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"
+        "secret": "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"
     }
 }
 
 app = connexion.App(__name__, specification_dir="./")
 app.add_api("swagger.yml")
-
-CORS(app.app, origins="*", allow_headers="*")
+CORS(app.app)

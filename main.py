@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import getopt, sys
 from waitress import serve
 
