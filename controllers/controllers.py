@@ -19,10 +19,7 @@ def ping(username: str, suffix: str = None):
 
     return pong
 
-@app.app.route("/getproducts", methods=["POST"])
-@cross_origin()
-def get_products_for_search_phrases(username: str = "vatsaaa"):
-    search_strings = request.get_json()["search_string"].split(";")
+def get_products(search_strings: str):
     stripped_search_strings = [s.strip() for s in search_strings]
     num_of_products = request.get_json()["num_of_products"]
 
@@ -38,10 +35,14 @@ def get_products_for_search_phrases(username: str = "vatsaaa"):
 
     return response
 
-@app.app.route("/getkeywords", methods=["POST"])
+@app.app.route("/getproducts", methods=["POST"])
 @cross_origin()
-def get_keywords_for_text():
-    text = request.get_json()["keywords_text"]
+def get_products_for_search_phrases(username: str = "vatsaaa"):
+    search_strings = request.get_json()["search_string"].split(";")
+
+    return get_products(search_strings)
+
+def get_keywords(text: str):
     prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + text
 
     response = None
@@ -63,10 +64,14 @@ def get_keywords_for_text():
 
     return jsonify(response)
 
-@app.app.route("/buildtext", methods=["POST"])
+@app.app.route("/getkeywords", methods=["POST"])
 @cross_origin()
-def build_text_from_keywords():
-    keywords = request.get_json()
+def get_keywords_for_text():
+    text = request.get_json()["keywords_text"]
+
+    return get_keywords(text)
+
+def build_text(keywords):
     prompt = Path("config/prompt_for_building_description_text.txt").read_text() + ",".join(keywords)
 
     response = None
@@ -89,6 +94,13 @@ def build_text_from_keywords():
         response.status_code = 200
     
     return jsonify(response)
+
+@app.app.route("/buildtext", methods=["POST"])
+@cross_origin()
+def build_text_from_keywords():
+    keywords = request.get_json()
+
+    return build_text(keywords)
 
 @app.app.route("/getlistings", methods=["POST"])
 @cross_origin()
