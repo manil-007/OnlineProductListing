@@ -8,6 +8,8 @@ cfg = {
         "input_file_name": "config/test.xlsx",
         "output_file_name": "extractedData",
         "number_of_products": 10,
+        "title_keywords_required": True,
+        "description_keywords_required": True,
         "credentials": {
             "username": "admin",
             "password": "admin"
