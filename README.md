@@ -37,6 +37,22 @@ OR
 
 `python main.py` # Run with browser - use for debugging
 
+### Run as centralised API in monitored mode
+`pm2 start ecosystem.config.js`
+
+### Checks
+#### Status
+`pm2 status`
+
+#### Logs
+`pm2 logs`
+
+#### Monitoring
+`pm2 monit`
+
+#### Stopping
+`pm2 stop "opl api"`
+
 ### Swagger UI
 Swagger UI is available only in test / debug mode. Access URL - localhost:5000/api/v1/ui/ to test the API.
 
@@ -48,3 +64,7 @@ Swagger UI is available only in test / debug mode. Access URL - localhost:5000/a
 - [OpenAI API Cookbook](https://github.com/openai/openai-cookbook)
 - [Handling rate limits](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_handle_rate_limits.ipynb)
 - [CORS Handling](https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/)
+- [Git Branching and Merging](https://www.varonis.com/blog/git-branching#:~:text=To%20merge%20branches%20locally%2C%20use,branch%20into%20the%20main%20branch.)
+- [Cannot do partial commit](https://stackoverflow.com/questions/5827944/git-error-on-commit-after-merge-fatal-cannot-do-a-partial-commit-during-a-mer)
+- [How to replace master branch in Git, entirely, from another branch?](https://stackoverflow.com/questions/2862590/how-to-replace-master-branch-in-git-entirely-from-another-branch)
+- [Nginx Beginner’s Guide](http://nginx.org/en/docs/beginners_guide.html)
