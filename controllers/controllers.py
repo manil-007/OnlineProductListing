@@ -117,7 +117,7 @@ def get_listings():
         for item in output[sp]:
             # Being defensive, for instances where 'title' was not found
             if item and item["title"]:
-                title_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["title"]
+                title_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["title"].replace(item["brand"], "")
 
                 try:
                     title_response = completion_with_backoff(model="text-davinci-003",
@@ -137,7 +137,7 @@ def get_listings():
 
             # Being defensive, for instances where 'description' was not found
             if item and item["description"]:
-                description_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["description"]
+                description_prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + item["description"].replace(item["brand"], "")
 
                 try:
                     description_response = completion_with_backoff(model="text-davinci-003",
@@ -171,7 +171,7 @@ def get_listings():
                                                         presence_penalty=0.0,
                                                         stop=["\"\"\""]
                                                         )
-                new_op[sp]["title"] = trimText(suggested_title_response.choices[0].text)
+                new_op[sp]["title"] = trimText(suggested_title_response.choices[0].text).replace(item["brand"], "")
             except openai.OpenAIError as eoai:
                 print("OpenAIError: " + eoai.user_message)
             except RetryError as ere:
@@ -193,7 +193,7 @@ def get_listings():
                                                                 presence_penalty=0.0,
                                                                 stop=["\"\"\""]
                                                                 )
-                new_op[sp]["details"] = trimText(suggested_description_response.choices[0].text)
+                new_op[sp]["details"] = trimText(suggested_description_response.choices[0].text).replace(item["brand"], "")
             except openai.OpenAIError as eoai:
                 print("OpenAIError: " + eoai.user_message)
             except RetryError as ere:
