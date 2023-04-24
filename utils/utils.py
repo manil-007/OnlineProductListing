@@ -1,7 +1,6 @@
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import *
-from webdriver_manager.firefox import *
 from bs4 import BeautifulSoup
 import xlrd
 
@@ -29,7 +28,7 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
     search_url = get_url(search_phrase)
     for page in range(1):
         driver.get(search_url.format(str(page)))
-        driver.implicitly_wait(5)
+        driver.implicitly_wait(3)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
 
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
@@ -39,7 +38,7 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
             product["id"] = sp_id
 
             if results and results[i]:
-                atag = results[i].h2.a
+                atag = results[i].h2.a 
                 product_url = 'https://www.amazon.in/' + atag.get('href')
                 driver.get(product_url)
                 product["url"] = product_url
@@ -69,9 +68,7 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
                 print(search_phrase, ": Product Details not present")
                 product["details"] = ""
             try:
-                start = details.index("Brand-") + len("Brand-")
-                end = details.index("|", start)
-                brand = details[start:end]
+                brand = details[details.rfind("Brand-") + len("Brand-"):details.find("|")]
                 product["brand"] = brand
             except:
                 print(search_phrase, ": Product Brand not present")
@@ -105,10 +102,10 @@ def create_output_file(headless, input_file_name: str=None, sss: str=None, num_o
     out = {}
     sp_id = 0
 
-    browserOptions = Options()
-    browserOptions.headless = headless
-    driver = webdriver.Firefox(options=browserOptions)
-    driver.delete_all_cookies()
+    chromeOptions = Options()
+    chromeOptions.headless = headless
+    
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chromeOptions)
 
     # stripped_search_strings is empty, so read search strings from xlsx
     if sss:
