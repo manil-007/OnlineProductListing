@@ -68,3 +68,19 @@ Swagger UI is available only in test / debug mode. Access URL - localhost:5000/a
 - [Cannot do partial commit](https://stackoverflow.com/questions/5827944/git-error-on-commit-after-merge-fatal-cannot-do-a-partial-commit-during-a-mer)
 - [How to replace master branch in Git, entirely, from another branch?](https://stackoverflow.com/questions/2862590/how-to-replace-master-branch-in-git-entirely-from-another-branch)
 - [Nginx Beginner’s Guide](http://nginx.org/en/docs/beginners_guide.html)
+- [Alpine, Slim, Stretch, Buster, Jessie, Bullseye — What are the Differences in Docker Images?](https://medium.com/swlh/alpine-slim-stretch-buster-jessie-bullseye-bookworm-what-are-the-differences-in-docker-62171ed4531d)
+- [Stop using Alpine Docker images, instead use distroless images](https://medium.com/inside-sumup/stop-using-alpine-docker-images-fbf122c63010)
+- [Smalled Docker images](https://learnk8s.io/blog/smaller-docker-images)
+- [DORA Metrics](https://www.linkedin.com/pulse/my-experience-using-dora-other-metrics-fredrik-norm%C3%A9n)
+- [Flow or DevOps Metrics](https://www.youtube.com/watch?v=84OvgV1CHOo)
+- [Value Stream Managemet](https://www.leanix.net/en/wiki/vsm/value-stream-management)
+- [DORA Metrics in detail](https://www.leanix.net/en/wiki/vsm/dora-metrics#:~:text=stream%20management%20efforts.-,What%20are%20DORA%20metrics%3F,change%20failure%20rate%20(CFR).)
+- [Docker getting started](https://medium.com/free-code-camp/docker-tutorial-getting-started-with-python-redis-and-nginx-73ec94ca2f1)
+- [Containerizing Python web apps with Docker, Flask, Nginx & uWSGI](https://www.youtube.com/watch?v=dVEjSmKFUVI)
+- [Make your Python Docker images secure, fast & small](https://medium.com/vantageai/how-to-make-your-python-docker-images-secure-fast-small-b3a6870373a0)
+https://github.com/joschan21?tab=repositories
+https://github.com/hwchase17
+https://levelup.gitconnected.com/16-system-design-concepts-i-wish-i-knew-before-the-interview-b8586e40a73b
+https://automationpanda.com/2017/03/14/python-testing-101-pytest/
+https://github.com/xtekky/gpt4free
+https://github.com/JushBJJ/Mr.-Ranedeer-AI-Tutor

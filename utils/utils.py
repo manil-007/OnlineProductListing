@@ -4,7 +4,7 @@ from webdriver_manager.chrome import *
 from bs4 import BeautifulSoup
 import xlrd
 
-import tiktoken
+# import tiktoken
 import openai
 
 from tenacity import retry, stop_after_attempt, wait_random_exponential
@@ -125,11 +125,11 @@ def create_output_file(headless, input_file_name: str=None, sss: str=None, num_o
             search_amazon(driver, sp, sp_id, num_of_products, out)
     return out
 
-def num_tokens_from_string(string: str, encoding_name: str) -> int:
-    """Returns the number of tokens in a text string."""
-    encoding = tiktoken.get_encoding(encoding_name)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
+# def num_tokens_from_string(string: str, encoding_name: str) -> int:
+#     """Returns the number of tokens in a text string."""
+#     encoding = tiktoken.get_encoding(encoding_name)
+#     num_tokens = len(encoding.encode(string))
+#     return num_tokens
 
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(60))
 def completion_with_backoff(**kwargs):

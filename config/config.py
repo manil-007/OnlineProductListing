@@ -3,8 +3,8 @@ import connexion
 
 cfg = {
     "app": {
-        "host": "localhost",
-        "port": 5000,
+        "host": "127.0.0.1",
+        "port": 5432,
         "input_file_name": "config/test.xlsx",
         "output_file_name": "extractedData",
         "number_of_products": 10,
