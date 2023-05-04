@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM centos:latest
 
 LABEL MAINTAINER="Ankur Vatsa"
 LABEL GitHub="https://github.com/vatsaaa"
@@ -8,8 +8,7 @@ LABEL description="A Docker container to serve Python API for Online Product Lis
 WORKDIR /app
 COPY . /app
 
-RUN apt update && apt upgrade -y && apt install python3 -y && apt install python3-pip -y && pip3 install --upgrade pip && pip3 install -r requirements.txt
-
-RUN set -ex apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+RUN cd /etc/yum.repos.d/ && sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+RUN yum upgrade -y && yum install python3.9 -y && pip3 install --upgrade pip && yum install firefox -y && pip3 install -r requirements.txt
 
 CMD ["python3", "main.py", "-h"]
