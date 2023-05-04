@@ -107,8 +107,6 @@ def create_output_file(headless, input_file_name: str=None, sss: str=None, num_o
     browserOptions.headless = headless
     driver = webdriver.Firefox(options=browserOptions)
     driver.delete_all_cookies()
-    
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chromeOptions)
 
     # stripped_search_strings is empty, so read search strings from xlsx
     if sss:
