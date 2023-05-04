@@ -1,6 +1,7 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 from webdriver_manager.chrome import *
+from webdriver_manager.firefox import *
 from bs4 import BeautifulSoup
 import xlrd
 
@@ -102,8 +103,10 @@ def create_output_file(headless, input_file_name: str=None, sss: str=None, num_o
     out = {}
     sp_id = 0
 
-    chromeOptions = Options()
-    chromeOptions.headless = headless
+    browserOptions = Options()
+    browserOptions.headless = headless
+    driver = webdriver.Firefox(options=browserOptions)
+    driver.delete_all_cookies()
     
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=chromeOptions)
 
