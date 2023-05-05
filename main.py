@@ -1,13 +1,37 @@
 #!/usr/bin/env python3
 
-import getopt, sys
-from waitress import serve
+import getopt
+import sys
+import logging
+import logging.config
 
+from waitress import serve
+from datetime import datetime
 from config.config import app, cfg
+
+
+CONFIG_DIR = "./config"
+LOG_DIR = "./logs"
+
+
+def setup_logging():
+    log_configs = {"dev": "logging.dev.ini", "prod": "logging.prod.ini"}
+    config = log_configs.get(cfg["env"], "logging.dev.ini")
+    config_path = "/".join([CONFIG_DIR, config])
+
+    timestamp = datetime.now().strftime("%Y%m%d-%H:%M:%S")
+
+    logging.config.fileConfig(
+        config_path,
+        disable_existing_loggers=False,
+        defaults={"logfilename": f"{LOG_DIR}/{timestamp}.log"},
+    )
+
 
 def usage(prog_name):
     print("Usage: \npython3 " + prog_name + " -u: prints this usage message" + "\nor")
     print("python3 " + prog_name + " -h: run the tool in headless mode, this should help running on server")
+
 
 def process_args(args):
     options = "uh"
@@ -26,11 +50,17 @@ def process_args(args):
                 headless_mode = True
     except getopt.error as err:
         # output error, and return with an error code
-        print (str(err))
+        print(str(err))
         
     cfg["app"]["headless"] = headless_mode
 
+
 if __name__=='__main__':
+    setup_logging()
+    logger = logging.getLogger(__name__)
+
+    logger.info("Program started")
     process_args(args=sys.argv)
 
     serve(app=app, host=cfg["app"]["host"], port=cfg["app"]["port"])
+    logger.info("Program Finished")
