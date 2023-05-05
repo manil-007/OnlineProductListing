@@ -33,6 +33,8 @@ OR
 ### Run as centralised API
 `python main.py -h` # Run in headless mode - preferred
 
+For running in verbose/debug mode
+`python -v main.py -h`
 OR
 
 `python main.py` # Run with browser - use for debugging
