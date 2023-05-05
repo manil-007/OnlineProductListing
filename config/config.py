@@ -27,7 +27,7 @@ cfg = {
     "openapi": {
         "secret": "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"
     },
-    "env": "dev"
+    "verboseMode": False
 }
 
 app = connexion.App(__name__, specification_dir="./")

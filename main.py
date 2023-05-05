@@ -14,9 +14,9 @@ CONFIG_DIR = "./config"
 LOG_DIR = "./logs"
 
 
-def setup_logging():
+def setup_logging(verbose):
     log_configs = {"dev": "logging.dev.ini", "prod": "logging.prod.ini"}
-    config = log_configs.get(cfg["env"], "logging.dev.ini")
+    config = log_configs.get(verbose, "logging.dev.ini")
     config_path = "/".join([CONFIG_DIR, config])
 
     timestamp = datetime.now().strftime("%Y%m%d-%H:%M:%S")
@@ -24,7 +24,7 @@ def setup_logging():
     logging.config.fileConfig(
         config_path,
         disable_existing_loggers=False,
-        defaults={"logfilename": f"{LOG_DIR}/{timestamp}.log"},
+        defaults={"logfilename": f"{LOG_DIR}/{timestamp}.log"}
     )
 
 
@@ -35,8 +35,9 @@ def usage(prog_name):
 
 def process_args(args):
     options = "uh"
-    long_options = ["Usage", "Headless"]
+    long_options = ["Usage", "Headless", "Verbose"]
     headless_mode = False
+    verbose_mode = False
 
     try:
         # Parse the arguments
@@ -48,19 +49,22 @@ def process_args(args):
                 exit(-2)
             elif currentArgument in ("-h", "--Headless"):
                 headless_mode = True
+            elif currentArgument in ("-v", "--Verbose"):
+                verbose_mode = True
     except getopt.error as err:
         # output error, and return with an error code
         print(str(err))
         
     cfg["app"]["headless"] = headless_mode
+    cfg["verbose"] = verbose_mode
 
 
 if __name__=='__main__':
-    setup_logging()
+    process_args(args=sys.argv)
+    setup_logging(cfg["verbose"])
     logger = logging.getLogger(__name__)
 
     logger.info("Program started")
-    process_args(args=sys.argv)
 
     serve(app=app, host=cfg["app"]["host"], port=cfg["app"]["port"])
     logger.info("Program Finished")
