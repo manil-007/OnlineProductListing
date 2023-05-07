@@ -2,3 +2,6 @@
 venv
 output
 config/test.numbers
+*.bak
+__pycache__
+*.log
