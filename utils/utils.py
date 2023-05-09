@@ -97,14 +97,13 @@ def search_amazon(driver, search_phrase, sp_id, num_of_products, final_output):
 
     return final_output
 
-
 def create_output_file(headless, input_file_name: str=None, sss: str=None, num_of_products: int=10):
     out = {}
     sp_id = 0
 
     browserOptions = Options()
     browserOptions.headless = headless
-    driver = webdriver.Firefox(options=browserOptions)
+    driver = webdriver.Firefox(options=browserOptions, log_path='./logs/geckodriver.log')
     driver.delete_all_cookies()
 
     # stripped_search_strings is empty, so read search strings from xlsx

@@ -16,14 +16,14 @@ In the above second step, it will consist of mutiple steps:
 7. Now this list of keywords will be used to generate title and description using chatpGPT.
 
 # Online Product Listing
-This repo will be used for extracting the information from the similar products and will generate the best listing of the products.
+OPL extracts information about the similar products and generates the best listing of the products.
 
 ## How to run
-### Setup a virtual environment
+### Setup the virtual environment
 `python3 -m venv venv` 
 `pip install -r requierments.txt`
 
-### Run as standalone module
+### Run as standalone executable
 `python app.py -h` # run in headless mode
 
 OR
@@ -31,10 +31,11 @@ OR
 `python app.py -u` # prints usage
 
 ### Run as centralised API
-`python main.py -h` # Run in headless mode - preferred
+`python main.py -h` # Headless mode (preferred)
 
-For running in verbose/debug mode
+Use -v flag to run in verbose/debug mode
 `python -v main.py -h`
+
 OR
 
 `python main.py` # Run with browser - use for debugging
@@ -42,21 +43,37 @@ OR
 ### Run as centralised API in monitored mode
 `pm2 start ecosystem.config.js`
 
-### Checks
-#### Status
+#### Checks Status in monitored mode
 `pm2 status`
 
-#### Logs
+#### Check Logs in monitored mode
 `pm2 logs`
 
-#### Monitoring
+#### Monitoring centralised API in monitored mode
 `pm2 monit`
 
-#### Stopping
+#### Stopping centralised API in monitored mode
 `pm2 stop "opl api"`
 
 ### Swagger UI
 Swagger UI is available only in test / debug mode. Access URL - localhost:5000/api/v1/ui/ to test the API.
+
+## Build and run containers
+### Build the container
+```bash 
+docker build -t opl-api-img-04052023 . 
+```
+
+### Run the container
+#### For development
+```bash
+docker run --rm -v $(pwd)/logs:/app/logs -v $(pwd)/config:/app/config -v $(pwd)/controllers:/apps/controllers:ro -v $(pwd)/utils:/apps/utils:ro -d -p 5000:5432 opl-api-img-04052023
+```
+
+#### For production
+```bash
+docker run --rm -v $(pwd)/logs:/app/logs -d p 5000:5432 opl-api-img-04052023
+```
 
 ## References
 - [Python REST APIs With Flask, Connexion, and SQLAlchemy](https://dassum.medium.com/python-rest-apis-with-flask-connexion-and-sqlalchemy-3c8c3292d9ce)

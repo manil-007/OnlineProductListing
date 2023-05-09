@@ -50,7 +50,6 @@ sortedcontainers==2.4.0
 soupsieve==2.4.1
 swagger-ui-bundle==0.0.9
 tenacity==8.2.2
-tiktoken==0.2.0
 tqdm==4.65.0
 trio==0.22.0
 trio-websocket==0.10.2
