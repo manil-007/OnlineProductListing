@@ -10,14 +10,14 @@ from datetime import datetime
 from config.config import app, cfg
 
 
-CONFIG_DIR = "./config"
+LOG_CONFIG_DIR = "./config/logging"
 LOG_DIR = "./logs"
 
 
 def setup_logging(verbose):
     log_configs = {"dev": "logging.dev.ini", "prod": "logging.prod.ini"}
     config = log_configs.get(verbose, "logging.dev.ini")
-    config_path = "/".join([CONFIG_DIR, config])
+    config_path = "/".join([LOG_CONFIG_DIR, config])
 
     timestamp = datetime.now().strftime("%Y%m%d-%H:%M:%S")
 
