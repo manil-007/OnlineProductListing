@@ -15,8 +15,11 @@ LOG_DIR = "./logs"
 
 
 def setup_logging(verbose):
+    env = "prod"
+    if verbose:
+        env = "dev"
     log_configs = {"dev": "logging.dev.ini", "prod": "logging.prod.ini"}
-    config = log_configs.get(verbose, "logging.dev.ini")
+    config = log_configs.get(env, "logging.prod.ini")
     config_path = "/".join([LOG_CONFIG_DIR, config])
 
     timestamp = datetime.now().strftime("%Y%m%d-%H:%M:%S")
@@ -34,10 +37,11 @@ def usage(prog_name):
 
 
 def process_args(args):
-    options = "uh"
-    long_options = ["Usage", "Headless", "Verbose"]
+    options = "uhvw"
+    long_options = ["Usage", "Headless", "Verbose", "WithoutGPT"]
     headless_mode = False
     verbose_mode = False
+    keywordsWithoutGPT = False
 
     try:
         # Parse the arguments
@@ -51,12 +55,15 @@ def process_args(args):
                 headless_mode = True
             elif currentArgument in ("-v", "--Verbose"):
                 verbose_mode = True
+            elif currentArgument in ("-w", "--WithoutGPT"):
+                keywordsWithoutGPT = True
     except getopt.error as err:
         # output error, and return with an error code
         print(str(err))
         
     cfg["app"]["headless"] = headless_mode
     cfg["verbose"] = verbose_mode
+    cfg["keywordsWithoutGPT"] = keywordsWithoutGPT
 
 
 if __name__=='__main__':
