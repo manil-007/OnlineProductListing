@@ -48,7 +48,7 @@ def get_products_for_search_phrases(username: str = "vatsaaa"):
 
 
 def get_keywords(text: str):
-    prompt = Path("config/prompt_for_extracting_keywords.txt").read_text() + text.lower()
+    prompt = Path("config/prompt/prompt_for_extracting_keywords.txt").read_text() + text.lower()
     keywords = None
     logging.info("Generating keywords")
     try:
@@ -81,10 +81,10 @@ def get_keywords_for_text():
 def build_text(keywords, flag):
     text = None
     if flag == "title":
-        prompt = Path("config/prompt_for_building_description_text.txt").read_text() + ",".join(keywords)
+        prompt = Path("config/prompt/prompt_for_building_description_text.txt").read_text() + ",".join(keywords)
         logger.info("Building Title using OpenAI")
     if flag == "description":
-        prompt = Path("config/prompt_for_building_title_text.txt").read_text() + ",".join(keywords)
+        prompt = Path("config/prompt/prompt_for_building_title_text.txt").read_text() + ",".join(keywords)
         logger.info("Building Description using OpenAI")
     try:
         response = completion_with_backoff(model="text-davinci-003",
