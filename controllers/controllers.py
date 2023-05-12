@@ -8,6 +8,7 @@ from flask_cors import cross_origin
 from tenacity import RetryError
 from config.config import cfg, app
 from utils.utils import create_output_file, completion_with_backoff
+from gensim.summarization import keywords
 
 logger = logging.getLogger(__name__)
 
@@ -49,25 +50,31 @@ def get_products_for_search_phrases(username: str = "vatsaaa"):
 
 def get_keywords(text: str):
     prompt = Path("config/prompt/prompt_for_extracting_keywords.txt").read_text() + text.lower()
-    keywords = None
+    extractedKeywords = None
     logging.info("Generating keywords")
-    try:
-        response = completion_with_backoff(model="text-davinci-003",
-                                       prompt="\"\"\"\n" + prompt + "\n\"\"\"",
-                                       temperature=0.4,
-                                       max_tokens=1024,
-                                       top_p=1.0,
-                                       frequency_penalty=0.0,
-                                       presence_penalty=0.0,
-                                       stop=["\"\"\""]
-                                       )
-        keywords = response["choices"][0]["text"].replace("\n", "").split(", ")
-    except openai.OpenAIError as eoai:
-        logger.error("OpenAIError : {a}".format(a=eoai.user_message))
-    except RetryError as ere:
-        logger.error("RetryError: A possible error OpenAI API error occurred!!")
+    if cfg["keywordsWithoutGPT"]:
+        try:
+            extractedKeywords = keywords(text, words=20, split=True, lemmatize=True)
+        except:
+            logging.error("Error Occured while extracting keywords using Gensim")
+    else:
+        try:
+            response = completion_with_backoff(model="text-davinci-003",
+                                               prompt="\"\"\"\n" + prompt + "\n\"\"\"",
+                                               temperature=0.4,
+                                               max_tokens=1024,
+                                               top_p=1.0,
+                                               frequency_penalty=0.0,
+                                               presence_penalty=0.0,
+                                               stop=["\"\"\""]
+                                               )
+            extractedKeywords = response["choices"][0]["text"].replace("\n", "").split(", ")
+        except openai.OpenAIError as eoai:
+            logger.error("OpenAIError : {a}".format(a=eoai.user_message))
+        except RetryError as ere:
+            logger.error("RetryError: A possible error OpenAI API error occurred!!")
 
-    return keywords
+    return extractedKeywords
 
 
 @app.app.route("/getkeywords", methods=["POST"])
@@ -88,16 +95,16 @@ def build_text(keywords, flag):
         logger.info("Building Description using OpenAI")
     try:
         response = completion_with_backoff(model="text-davinci-003",
-                                       prompt="\"\"\"\n" + prompt + "\n\"\"\"",
-                                       temperature=0.4,
-                                       max_tokens=1024,
-                                       top_p=1.0,
-                                       frequency_penalty=0.0,
-                                       presence_penalty=0.0,
-                                       stop=["\"\"\""]
-                                       )
+                                           prompt="\"\"\"\n" + prompt + "\n\"\"\"",
+                                           temperature=0.4,
+                                           max_tokens=1024,
+                                           top_p=1.0,
+                                           frequency_penalty=0.0,
+                                           presence_penalty=0.0,
+                                           stop=["\"\"\""]
+                                           )
         text = response["choices"][0]["text"].replace("\n", "")
-    except openai.OpenAIError as eoai: 
+    except openai.OpenAIError as eoai:
         logger.error("OpenAIError : {a}".format(a=eoai.user_message))
     except RetryError as ere:
         logger.error("RetryError: A possible error OpenAI API error occurred!!")
@@ -147,7 +154,7 @@ def get_listings():
 
         if len(new_op[sp]["title_keywords"]) > 0:
             new_op[sp]["title"] = build_text(new_op[sp]["title_keywords"], "title")
-        
+
         if len(new_op[sp]["description_keywords"]) > 0:
             new_op[sp]["details"] = build_text(new_op[sp]["description_keywords"], "description")
 
