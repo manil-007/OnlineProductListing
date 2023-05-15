@@ -22,7 +22,7 @@ def setup_logging(verbose):
     config = log_configs.get(env, "logging.prod.ini")
     config_path = "/".join([LOG_CONFIG_DIR, config])
 
-    timestamp = datetime.now().strftime("%Y%m%d-%H:%M:%S")
+    timestamp = datetime.now().strftime("%Y%m%d-%H_%M_%S")
 
     logging.config.fileConfig(
         config_path,
