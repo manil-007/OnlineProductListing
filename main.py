@@ -18,7 +18,7 @@ def setup_logging(verbose):
     env = "prod"
     if verbose:
         env = "dev"
-    log_configs = {"dev": "logging.dev.ini", "prod": "logging.prod.ini"}
+    log_configs = {"dev": "dev.ini", "prod": "prod.ini"}
     config = log_configs.get(env, "logging.prod.ini")
     config_path = "/".join([LOG_CONFIG_DIR, config])
 
