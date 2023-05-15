@@ -13,7 +13,7 @@ jobs:
                             password: ${{ secrets.GITHUB_TOKEN }}
                      - name: Set current date as env variable
                        id: datetime
-                       run: echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+                       run: echo "NOW=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
                      - name: Build the opl-api docker image
                        run: |
                             docker build . --tag ghcr.io/vatsaaa/opl-api-image-$NOW:latest
