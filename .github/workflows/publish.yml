@@ -17,5 +17,4 @@ jobs:
                      - name: Build the opl-api docker image
                        run: |
                             docker build . --tag ghcr.io/vatsaaa/opl-api-image-$NOW:latest
-                            docker run ghcr.io/vatsaaa/opl-api-image-$NOW:latest
                             docker push ghcr.io/vatsaaa/opl-api-image-$NOW:latest
