@@ -16,5 +16,5 @@ jobs:
                        run: echo "NOW=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
                      - name: Build the opl-api docker image
                        run: |
-                            docker build . --tag ghcr.io/vatsaaa/opl-api-image-$NOW:latest
-                            docker push ghcr.io/vatsaaa/opl-api-image-$NOW:latest
+                            docker build . --tag ghcr.io/${{ github.actor }}/opl-api-image-$NOW
+                            docker push ghcr.io/${{ github.actor }}/opl-api-image-$NOW

@@ -103,3 +103,4 @@ https://levelup.gitconnected.com/16-system-design-concepts-i-wish-i-knew-before-
 https://automationpanda.com/2017/03/14/python-testing-101-pytest/
 https://github.com/xtekky/gpt4free
 https://github.com/JushBJJ/Mr.-Ranedeer-AI-Tutor
+- [Developing inside containers](https://code.visualstudio.com/docs/devcontainers/containers)
