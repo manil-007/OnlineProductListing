@@ -29,7 +29,10 @@ def main(argumentList):
         # output error, and return with an error code
         print (str(err))
 
-    create_output_file(headless_mode, cfg["app"]["input_file_name"], None, cfg["app"]["number_of_products"])
+    create_output_file(headless_mode
+                       , cfg.get("app").get("input_file_name")
+                       , None
+                       , cfg.get("app").get("number_of_products"))
 
 
 if __name__ == '__main__':

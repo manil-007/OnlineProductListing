@@ -1,4 +1,4 @@
-import xlrd
+import openpyxl
 import openai
 import logging
 
@@ -109,20 +109,19 @@ def create_output_file(headless, input_file_name: str=None, sss: str=None, num_o
     driver = webdriver.Firefox(options=browser_options)
     driver.delete_all_cookies()
 
-    # stripped_search_strings is empty, so read search strings from xlsx
+    # stripped_search_strings is empty, so read search strings from xls
     if sss:
         for sp in sss:
             sp_id += 1
             out[sp] = []
             search_amazon(driver, sp, sp_id, num_of_products, out)
     else:
-        wb = xlrd.open_workbook(input_file_name)
-        sheet = wb.sheet_by_index(0)
-        sheet.cell_value(0, 0)
+        wb = openpyxl.load_workbook(input_file_name)
+        sheet = wb.active
 
-        for i in range(1, sheet.nrows):
-            sp = str(sheet.cell_value(i, 1))
-            sp_id = +1
+        for i in range(2, sheet.max_row + 1):
+            sp = str(sheet.cell(row=i, column=2).value)
+            sp_id += 1
             out[sp] = []
             search_amazon(driver, sp, sp_id, num_of_products, out)
     return out
