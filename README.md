@@ -2,8 +2,10 @@ Mentioning the points as discussed:
 1. For the data extraction, the user will input the data in two parts
    a. List of search products separated by semicolon
    b. Top 'n' products to be searched
-2. After getting the user inputs, the api call will be made which will generate the data in the form of dict like
+2. After getting the user inputs, the api call will be made which will generate the data in the form of dictinary like
+   ```json
    {"searchedProductName": "Hair Oil", "GeneratedProductTitle": "To be generated", "GeneratedProductDescription": "To be generated", "keywords": "[list of    keywords]"}
+   ```
 3. At last the user will check and proceed with updating the listed product data or export the table data into excel sheel.
 
 In the above second step, it will consist of mutiple steps:
