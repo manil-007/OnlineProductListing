@@ -3,12 +3,11 @@ import logging
 
 from pathlib import Path
 from datetime import datetime as dt
-from flask import jsonify, request, wrappers
+from flask import jsonify, request
 from flask_cors import cross_origin
 from tenacity import RetryError
 from config.config import cfg, app
 from utils.utils import create_output_file, completion_with_backoff
-from gensim.summarization import keywords
 
 logger = logging.getLogger(__name__)
 
@@ -51,28 +50,23 @@ def get_products_for_search_phrases(username: str = "vatsaaa"):
 def get_keywords(text: str):
     prompt = Path("config/prompt/extract_keywords.txt").read_text() + text.lower()
     extractedKeywords = None
-    logging.info("Generating keywords")
-    if cfg["keywordsWithoutGPT"]:
-        try:
-            extractedKeywords = keywords(text, words=20, split=True, lemmatize=True)
-        except:
-            logging.error("Error Occured while extracting keywords using Gensim")
-    else:
-        try:
-            response = completion_with_backoff(model="text-davinci-003",
-                                               prompt="\"\"\"\n" + prompt + "\n\"\"\"",
-                                               temperature=0.4,
-                                               max_tokens=1024,
-                                               top_p=1.0,
-                                               frequency_penalty=0.0,
-                                               presence_penalty=0.0,
-                                               stop=["\"\"\""]
-                                               )
-            extractedKeywords = response["choices"][0]["text"].replace("\n", "").split(", ")
-        except openai.OpenAIError as eoai:
-            logger.error("OpenAIError : {a}".format(a=eoai.user_message))
-        except RetryError as ere:
-            logger.error("RetryError: A possible error OpenAI API error occurred!!")
+
+    try:
+        logging.info("Generating keywords")
+        response = completion_with_backoff(model="text-davinci-003",
+                                            prompt="\"\"\"\n" + prompt + "\n\"\"\"",
+                                            temperature=0.4,
+                                            max_tokens=1024,
+                                            top_p=1.0,
+                                            frequency_penalty=0.0,
+                                            presence_penalty=0.0,
+                                            stop=["\"\"\""]
+                                            )
+        extractedKeywords = response["choices"][0]["text"].replace("\n", "").split(", ")
+    except openai.OpenAIError as eoai:
+        logger.error("OpenAIError : {a}".format(a=eoai.user_message))
+    except RetryError as ere:
+        logger.error("RetryError: A possible error OpenAI API error occurred!!")
 
     return extractedKeywords
 

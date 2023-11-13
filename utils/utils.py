@@ -2,12 +2,14 @@ import xlrd
 import openai
 import logging
 
-from tenacity import retry, stop_after_attempt, wait_random_exponential
-from config.config import cfg
-from utils.ProvisionOpenAI import ProvisionOpenAI
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
-from bs4 import BeautifulSoup
+from tenacity import retry, stop_after_attempt, wait_random_exponential
+
+# Project imports
+from config.config import cfg
+from utils.ProvisionOpenAI import ProvisionOpenAI
 
 ProvisionOpenAI.set_api_key(cfg["openapi"]["secret"])
 openai.api_key = ProvisionOpenAI.get_api_key()
@@ -101,9 +103,10 @@ def create_output_file(headless, input_file_name: str=None, sss: str=None, num_o
     out = {}
     sp_id = 0
 
-    browserOptions = Options()
-    browserOptions.headless = headless
-    driver = webdriver.Firefox(options=browserOptions, log_path='./logs/geckodriver.log')
+    browser_options = Options()
+    browser_options.add_argument("-headless") if headless else None
+
+    driver = webdriver.Firefox(options=browser_options)
     driver.delete_all_cookies()
 
     # stripped_search_strings is empty, so read search strings from xlsx

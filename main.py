@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-import getopt
-import sys
-import logging
+import getopt, logging, sys
 import logging.config
 
 from waitress import serve
@@ -24,11 +22,10 @@ def setup_logging(verbose):
 
     timestamp = datetime.now().strftime("%Y%m%d-%H_%M_%S")
 
-    logging.config.fileConfig(
-        config_path,
-        disable_existing_loggers=False,
-        defaults={"logfilename": f"{LOG_DIR}/{timestamp}.log"}
-    )
+    logging.config.fileConfig(config_path,
+                              disable_existing_loggers=False,
+                              defaults={"logfilename": f"{LOG_DIR}/{timestamp}.log"}
+                            )
 
 
 def usage(prog_name):

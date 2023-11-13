@@ -30,7 +30,7 @@ OR
 
 `python app.py -u` # prints usage
 
-### Run as centralised API
+### Run as centralised API - Preferred
 `python main.py -h` # Headless mode (preferred)
 
 Use -v flag to run in verbose/debug mode
